@@ -22,6 +22,10 @@ interface Props {
 const { foto, texto, nivel = 'h2', id, alto = '84svh', portada = false, grupos } = Astro.props;
 const Tag = nivel;
 const ratio = foto.src.height / foto.src.width;
+// tamaños: hasta el ancho original; en pantallas verticales una foto horizontal se muestra
+// mucho más ancha que la pantalla (cubre la altura), así que se pide en proporción
+const anchos = [...new Set([640, 960, 1280, 1600, 1920, 2400, 2880].filter((w) => w < foto.src.width).concat(foto.src.width))];
+const tamanos = ratio < 1 ? `(orientation: portrait) ${Math.round(112 * 0.75 / ratio)}vw, 112vw` : '112vw';
 // cada grupo es una lista de palabras; entre grupos sí se puede cortar la línea
 let n = 0;
 const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: n++ })));
@@ -40,8 +44,9 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
       src={foto.src}
       alt={foto.alt}
       formats={['avif', 'webp']}
-      widths={[480, 768, 1080, 1440, 1920].filter((w) => w <= foto.src.width)}
-      sizes="100vw"
+      widths={anchos}
+      sizes={tamanos}
+      quality={80}
       loading={portada ? 'eager' : 'lazy'}
       fetchpriority={portada ? 'high' : 'auto'}
       decoding={portada ? 'sync' : 'async'}

@@ -21,8 +21,9 @@ import { titulos, casa } from '../../data/fotos';
         src={casa.interior.src}
         alt={casa.interior.alt}
         formats={['avif', 'webp']}
-        widths={[480, 800, 1200]}
+        widths={[600, 900, 1200, 1600, 2000]}
         sizes="(min-width: 900px) 50vw, 100vw"
+        quality={80}
       />
     </figure>
     <figure class="casa__foto casa__foto--chica" data-revelar="foto" style="--retraso:200ms">
@@ -30,8 +31,9 @@ import { titulos, casa } from '../../data/fotos';
         src={casa.estructura.src}
         alt={casa.estructura.alt}
         formats={['avif', 'webp']}
-        widths={[400, 640, 960]}
+        widths={[400, 600, 900, 1200]}
         sizes="(min-width: 900px) 26vw, 70vw"
+        quality={80}
       />
     </figure>
   </div>

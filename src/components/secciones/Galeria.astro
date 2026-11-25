@@ -110,8 +110,9 @@ const fotos = await Promise.all(
                   src={f.src}
                   alt={f.alt}
                   formats={['avif', 'webp']}
-                  widths={[360, 560, 860]}
-                  sizes="(min-width: 900px) 40vw, 78vw"
+                  widths={[400, 600, 800, 1000, 1300, 1600, 2000].filter((w) => w < f.src.width).concat(f.src.width)}
+                  sizes={`(min-width: 900px) ${Math.round(Math.max(496, 620 * f.ratio) * 1.14)}px, ${Math.round(Math.max(78, 97.5 * f.ratio))}vw`}
+                  quality={80}
                 />
               </span>
             </button>
