@@ -115,4 +115,37 @@ import Logo from './Logo.astro';
   .intro.abre .intro__linea {
     opacity: 0;
   }
+
+  /* reducir movimiento: la intro solo con fundidos */
+  :global(html.suave) .intro__logo {
+    transform: translate(-50%, -14px);
+    opacity: 0;
+    animation: intro-funde 900ms ease 300ms forwards;
+  }
+  :global(html.suave) .intro__logo--reflejo {
+    transform: translate(-50%, 14px) scaleY(-1);
+    animation-name: intro-funde-reflejo;
+  }
+  :global(html.suave) .intro__linea {
+    transform: none;
+    opacity: 0;
+    animation: intro-funde 700ms ease forwards;
+  }
+  :global(html.suave) .intro__mitad {
+    transition: opacity 900ms ease;
+  }
+  :global(html.suave) .intro.abre .intro__mitad {
+    transform: none;
+    opacity: 0;
+  }
+  @keyframes intro-funde {
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes intro-funde-reflejo {
+    to {
+      opacity: 0.18;
+    }
+  }
 </style>

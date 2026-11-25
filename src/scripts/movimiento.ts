@@ -59,9 +59,6 @@ function introYPortada() {
       setTimeout(arrancar, 150);
       setTimeout(() => {
         raiz.classList.remove('con-intro');
-        try {
-          sessionStorage.setItem('bh-intro', '1');
-        } catch {}
       }, 1300);
     };
     setTimeout(abrir, 1700);
