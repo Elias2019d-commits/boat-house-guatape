@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://elias2019d-commits.github.io/boat-house-guatape/sitemap-index.xml

@@ -1,0 +1,32 @@
+{
+  "moneda": "COP",
+  "nota": "Precios por pareja, por noche. Cada noche se cobra según el día en que empieza: lun-jue semana, vie-dom fin de semana.",
+  "festivoComoFinde": true,
+  "festivoComoFindeTODO": "TODO(clienta): confirmar la regla de festivos. Por defecto, la noche anterior a un festivo cobra fin de semana.",
+  "planes": [
+    {
+      "id": "noche",
+      "nombre": "La noche en Boat House",
+      "resumen": "Todo lo que incluye la casa: lancha, jacuzzi, kayak, paddle board e ingredientes del desayuno.",
+      "semana": 550000,
+      "finde": 700000
+    },
+    {
+      "id": "extreme",
+      "nombre": "Extreme Plan",
+      "resumen": "Tu noche en la casa más una hora de jet ski con sonido.",
+      "detalle": "Jet ski con motor 1630, de @nauticaguatape.",
+      "semana": 860000,
+      "finde": 1010000
+    },
+    {
+      "id": "sorpresa",
+      "nombre": "Sorpresa frente al agua",
+      "resumen": "Globos, flores y pétalos para celebrar de a dos.",
+      "semana": null,
+      "finde": null,
+      "todo": "TODO(clienta): precio del plan Sorpresa."
+    }
+  ],
+  "fechasEspeciales": []
+}

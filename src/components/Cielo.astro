@@ -1,0 +1,108 @@
+---
+/**
+ * El día al bajar: capas fijas detrás del contenido (mañana, día, atardecer, noche).
+ * Con el scroll solo cambia la opacidad de cada capa. Sin JS o con reduced motion,
+ * cada sección pinta su propio fondo.
+ */
+---
+
+<div class="cielo" aria-hidden="true" data-cielo>
+  <div class="capa capa--manana"></div>
+  <div class="capa capa--dia" data-capa="dia"></div>
+  <div class="capa capa--atardecer" data-capa="atardecer"></div>
+  <div class="capa capa--noche" data-capa="noche"></div>
+</div>
+
+<style>
+  .cielo {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    display: none;
+  }
+
+  :global(html.cielo-activo) .cielo {
+    display: block;
+  }
+
+  .capa {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    will-change: opacity;
+  }
+
+  .capa--manana {
+    background: var(--bruma);
+    opacity: 1;
+  }
+
+  .capa--dia {
+    background: var(--velo);
+  }
+
+  /* Embalse con la luz del Ocaso entrando de costado */
+  .capa--atardecer {
+    background:
+      radial-gradient(120% 70% at 100% 100%, rgb(232 164 95 / 0.24), rgb(232 164 95 / 0) 62%),
+      var(--embalse);
+  }
+
+  .capa--noche {
+    background: var(--noche);
+  }
+</style>
+
+<script>
+  const raiz = document.documentElement;
+  const reducir = matchMedia('(prefers-reduced-motion: reduce)');
+  const capas = [...document.querySelectorAll<HTMLElement>('[data-capa]')];
+  const secciones = [...document.querySelectorAll<HTMLElement>('[data-momento]')];
+
+  // inicio de cada momento = primera sección que lo usa
+  let limites: { capa: HTMLElement; inicio: number }[] = [];
+  function medir() {
+    limites = capas.map((capa) => {
+      const s = secciones.find((x) => x.dataset.momento === capa.dataset.capa);
+      return { capa, inicio: s ? s.getBoundingClientRect().top + scrollY : Infinity };
+    });
+  }
+
+  const suave = (t: number) => t * t * (3 - 2 * t);
+  function pintar() {
+    const vh = innerHeight;
+    const centro = scrollY + vh * 0.5;
+    for (const { capa, inicio } of limites) {
+      // la transición ocurre mientras la foto de título de la sección cruza la pantalla
+      const t = Math.min(1, Math.max(0, (centro - (inicio - vh * 0.15)) / (vh * 0.6)));
+      capa.style.opacity = String(suave(t));
+    }
+  }
+
+  function activar() {
+    if (reducir.matches) {
+      raiz.classList.remove('cielo-activo');
+      return;
+    }
+    raiz.classList.add('cielo-activo');
+    medir();
+    pintar();
+  }
+
+  // posiciones ya medidas: pintar en cada scroll son tres escrituras de opacity
+  addEventListener(
+    'scroll',
+    () => {
+      if (raiz.classList.contains('cielo-activo')) pintar();
+    },
+    { passive: true },
+  );
+  new ResizeObserver(() => {
+    medir();
+    pintar();
+  }).observe(document.body);
+  reducir.addEventListener('change', activar);
+  activar();
+
+</script>

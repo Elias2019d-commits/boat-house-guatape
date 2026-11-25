@@ -1,0 +1,153 @@
+---
+/**
+ * Cierre de la página: la línea del agua cruza la pantalla de punta a punta y la frase
+ * sale de ella con su reflejo ondulando. Mismo gesto que los títulos, sin foto.
+ */
+const frase = 'Nos vemos sobre el agua.';
+const palabras = frase.split(' ');
+---
+
+<div class="despedida" data-revelar="despedida">
+  <div class="marco despedida__marco">
+    <div class="despedida__agua">
+    <p class="despedida__frase">
+      <span class="visually-hidden">{frase}</span>
+      {
+        palabras.map((p, i) => (
+          <>
+            <span class="pal" aria-hidden="true">
+              <span class="pal__in" style={`--i:${i}`}>
+                {p}
+              </span>
+            </span>{' '}
+          </>
+        ))
+      }
+    </p>
+    <p class="despedida__frase despedida__reflejo" aria-hidden="true">
+      {
+        palabras.map((p, i) => (
+          <>
+            <span class="pal">
+              <span class="pal__in" style={`--i:${i}`}>
+                {p}
+              </span>
+            </span>{' '}
+          </>
+        ))
+      }
+    </p>
+    </div>
+    <span class="despedida__linea" aria-hidden="true"></span>
+  </div>
+  <div class="marco despedida__accion">
+    <a class="boton boton--ocaso" data-iman href="#reserva">Ver fechas disponibles</a>
+  </div>
+</div>
+
+<style>
+  .despedida {
+    margin-top: var(--s-10);
+    padding-bottom: var(--s-7);
+    overflow: hidden;
+  }
+
+  .despedida__marco {
+    position: relative;
+    padding-bottom: 0.9em;
+    font-size: clamp(2.75rem, 1.2rem + 6.4vw, 7.5rem);
+  }
+
+  .despedida__agua {
+    position: relative;
+  }
+
+  .despedida__frase {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 200;
+    font-size: 1em;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--espuma);
+    max-width: 12ch;
+  }
+
+  .pal {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.24em;
+    margin-bottom: -0.24em;
+  }
+
+  .pal__in {
+    display: inline-block;
+  }
+
+  .despedida__linea {
+    position: absolute;
+    left: 0;
+    right: 0;
+    /* sobre la línea de base del último renglón (Spectral, interlineado 1) */
+    top: calc(100% - 0.9em - 0.21em);
+    height: 1px;
+    background: color-mix(in srgb, var(--espuma) 45%, transparent);
+    transform-origin: 0 50%;
+  }
+
+  /* el reflejo es una copia exacta, volteada sobre la línea */
+  .despedida__reflejo {
+    position: absolute;
+    inset: 0;
+    transform: scaleY(-1);
+    transform-origin: 50% calc(100% - 0.21em);
+    opacity: 0.16;
+    filter: url(#onda-viva);
+    -webkit-mask-image: linear-gradient(to top, transparent 0, transparent 0.2em, #000 0.21em, transparent 1.05em);
+    mask-image: linear-gradient(to top, transparent 0, transparent 0.2em, #000 0.21em, transparent 1.05em);
+    user-select: none;
+  }
+
+  .despedida__accion {
+    margin-top: var(--s-7);
+  }
+
+  /* coreografía */
+  :global(html.movido) .despedida__linea {
+    transform: scaleX(0);
+    transition: transform 1600ms cubic-bezier(0.76, 0, 0.18, 1);
+  }
+
+  :global(html.movido) .despedida .pal__in {
+    transform: translateY(105%);
+    transition: transform 1300ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(700ms + var(--i) * 110ms);
+  }
+
+  :global(html.movido) .despedida__reflejo .pal__in {
+    transform: translateY(105%);
+    transition-delay: calc(950ms + var(--i) * 110ms);
+  }
+
+  :global(html.movido) .despedida__accion {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 900ms ease 1500ms,
+      transform 1100ms cubic-bezier(0.16, 1, 0.3, 1) 1500ms;
+  }
+
+  :global(html.movido) .despedida.visto .despedida__linea {
+    transform: none;
+  }
+
+  :global(html.movido) .despedida.visto .despedida__marco .pal__in {
+    transform: none;
+  }
+
+  :global(html.movido) .despedida.visto .despedida__accion {
+    opacity: 1;
+    transform: none;
+  }
+</style>

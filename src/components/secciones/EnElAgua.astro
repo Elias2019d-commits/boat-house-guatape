@@ -1,0 +1,128 @@
+---
+import { Picture } from 'astro:assets';
+import TituloAgua from '../TituloAgua.astro';
+import { titulos, agua } from '../../data/fotos';
+---
+
+<section id="en-el-agua" class="seccion" aria-labelledby="titulo-agua" data-momento="dia">
+  <TituloAgua foto={titulos.agua} texto="En el agua" id="titulo-agua" />
+
+  <div class="marco seccion__cuerpo enagua">
+    <div class="enagua__texto" data-revelar="grupo">
+      <p class="sub">Kayak y paddle board incluidos, a la hora que quieras.</p>
+      <p class="texto">
+        Salen desde la cubierta. Temprano, cuando el embalse está quieto, o al final de la tarde, con el sol bajando
+        detrás de las montañas.
+      </p>
+    </div>
+
+    <figure class="enagua__kayak" data-revelar="foto">
+      <Picture
+        src={agua.kayak.src}
+        alt={agua.kayak.alt}
+        formats={['avif', 'webp']}
+        widths={[400, 700, 1000]}
+        sizes="(min-width: 900px) 34vw, 86vw"
+      />
+    </figure>
+
+    <article class="jetski" aria-labelledby="titulo-jetski" data-revelar="sube">
+      <Picture
+        src={agua.jetski.src}
+        alt={agua.jetski.alt}
+        formats={['avif', 'webp']}
+        widths={[320, 560, 800]}
+        sizes="(min-width: 900px) 22vw, 40vw"
+        class="jetski__foto"
+      />
+      <div class="jetski__texto">
+        <h3 id="titulo-jetski" class="sub">Jet ski, aparte</h3>
+        <p>
+          Una hora de jet ski con sonido viene en el Extreme Plan. Las lanchas y los jet ski son de
+          <a href="https://www.instagram.com/nauticaguatape/" rel="noopener" target="_blank">@nauticaguatape</a>.
+        </p>
+        <a href="#plan-extreme" class="jetski__link">Ver el Extreme Plan</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<style>
+  .enagua {
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .enagua__texto {
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+  }
+
+  .enagua__texto .sub {
+    color: var(--embalse);
+    max-width: 22ch;
+  }
+
+  .enagua__kayak {
+    width: 86%;
+    overflow: hidden;
+    border-radius: var(--r-foto);
+  }
+
+  .enagua :global(img) {
+    width: 100%;
+    border-radius: var(--r-foto);
+  }
+
+  .jetski {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: var(--s-5);
+    align-items: end;
+    padding-top: var(--s-6);
+    border-top: var(--linea);
+  }
+
+  .jetski__texto {
+    display: grid;
+    gap: var(--s-3);
+    font-size: var(--t-detalle);
+    line-height: 1.55;
+  }
+
+  .jetski__texto .sub {
+    color: var(--embalse);
+    font-size: 1.375rem;
+  }
+
+  .jetski__link {
+    justify-self: start;
+    font-weight: 550;
+    color: var(--embalse);
+    padding-block: var(--s-2);
+  }
+
+  @media (min-width: 900px) {
+    .enagua {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 24px;
+    }
+    .enagua__texto {
+      grid-column: 1 / span 5;
+    }
+    .enagua__kayak {
+      grid-column: 7 / span 5;
+      grid-row: 1 / span 2;
+      width: auto;
+    }
+    .jetski {
+      grid-column: 1 / span 5;
+      grid-row: 2;
+      align-self: end;
+    }
+    .jetski__texto {
+      font-size: var(--t-texto);
+    }
+  }
+</style>

@@ -1,0 +1,22 @@
+node_modules
+dist
+.astro
+.env
+
+# skills de terceros instaladas para el desarrollo
+.claude/skills
+.agents
+skills-lock.json
+
+# material de trabajo (originales pesados, propuesta y brief de la clienta)
+fotos-originales
+/assets/fotos-provisorias
+*.pdf
+PROMPT-claude-code.md
+
+# runtime de Impeccable
+.impeccable/questions
+.impeccable/mocks
+.impeccable/review
+/assets/
+.impeccable/hook.cache.json

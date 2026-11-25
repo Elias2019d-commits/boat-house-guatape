@@ -1,0 +1,268 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: 72px;
+  /* bloquear el scroll (menú, visor) no cambia el ancho de la página */
+  scrollbar-gutter: stable;
+  color-scheme: light;
+  background: var(--bruma);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: var(--t-texto);
+  line-height: 1.6;
+  color: var(--noche);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+picture {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--serif);
+  font-weight: 200;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  transition: text-decoration-color var(--d-corta) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--agua) 40%, transparent);
+  color: var(--noche);
+}
+
+:focus-visible {
+  outline: 2px solid var(--embalse);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+[data-tono='oscuro'] :focus-visible,
+[data-tono='oscuro']:focus-visible {
+  outline-color: var(--ocaso);
+}
+
+[data-tono='oscuro'] ::selection {
+  background: color-mix(in srgb, var(--ocaso) 45%, transparent);
+  color: var(--espuma);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.saltar {
+  position: absolute;
+  left: var(--gutter);
+  top: -100px;
+  z-index: 100;
+  background: var(--espuma);
+  color: var(--embalse);
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-pill);
+}
+
+.saltar:focus {
+  top: var(--s-3);
+}
+
+/* contenedor */
+.marco {
+  width: 100%;
+  max-width: calc(var(--ancho) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* tipografía reutilizable */
+.titulo {
+  font-family: var(--serif);
+  font-weight: 200;
+  font-size: var(--t-titulo);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+}
+
+.sub {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: var(--t-sub);
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+}
+
+.frase {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: var(--t-frase);
+  line-height: 1.5;
+  max-width: 34ch;
+}
+
+.texto {
+  max-width: 62ch;
+}
+
+.detalle {
+  font-size: var(--t-detalle);
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+}
+
+/* botones: lo único redondeado */
+.boton {
+  --fondo: var(--embalse);
+  --tinta: var(--espuma);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 48px;
+  padding: 0 var(--s-6);
+  border-radius: var(--r-pill);
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 550;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    transform var(--d-toque) var(--ease-out),
+    opacity var(--d-corta) var(--ease-out);
+}
+
+.boton:active {
+  transform: scale(0.97);
+}
+
+.boton--ocaso {
+  --fondo: var(--ocaso);
+  --tinta: var(--noche);
+}
+
+.boton[aria-disabled='true'],
+.boton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.boton[aria-disabled='true']:active,
+.boton:disabled:active {
+  transform: none;
+}
+
+/* secciones: aire entre ellas */
+.seccion {
+  position: relative;
+  padding-top: var(--seccion);
+}
+
+/* contenido debajo de la foto de título */
+.seccion__cuerpo {
+  padding-top: var(--s-9);
+}
+
+/* Sin JS el fondo lo pinta cada sección. Con JS lo pinta el cielo (capas fijas). */
+.seccion[data-momento='manana'] { background: var(--bruma); }
+.seccion[data-momento='dia'] { background: var(--velo); }
+.seccion[data-momento='atardecer'] { background: var(--embalse); }
+.seccion[data-momento='noche'] { background: var(--noche); }
+html.cielo-activo .seccion { background: transparent; }
+
+[data-tono='oscuro'] {
+  color: var(--bruma);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,151 @@
+---
+import Logo from '../Logo.astro';
+import Despedida from '../Despedida.astro';
+
+const redes = [
+  { href: 'https://wa.me/573117197851', nombre: 'WhatsApp', valor: '+57 311 719 7851' },
+  { href: 'https://www.instagram.com/boat_house_guatape/', nombre: 'Instagram', valor: '@boat_house_guatape' },
+  { href: 'https://www.tiktok.com/@boat.house.guatape', nombre: 'TikTok', valor: '@boat.house.guatape' },
+];
+---
+
+<section id="como-llegar" class="seccion contacto" aria-labelledby="titulo-llegar" data-momento="noche" data-tono="oscuro">
+  <div class="marco contacto__marco">
+    <div class="contacto__texto" data-revelar="grupo">
+      <h2 id="titulo-llegar" class="titulo">Cómo llegar</h2>
+      <p class="frase">
+        Salimos en lancha desde el muelle, en el embalse de Guatapé. Te pasamos el punto exacto por WhatsApp.
+      </p>
+      <ul role="list" class="redes">
+        {
+          redes.map((r) => (
+            <li>
+              <span class="redes__nombre">{r.nombre}</span>
+              <a href={r.href} rel="noopener" target="_blank">
+                {r.valor}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- TODO(clienta): ubicación exacta del muelle. Cuando llegue, reemplazar este bloque por el mapa
+         (iframe de Google Maps con loading="lazy" y título, o una imagen estática con link). -->
+    <div class="mapa" data-revelar="sube" style="--retraso:200ms" role="img" aria-label="Mapa del muelle, pendiente">
+      <svg viewBox="0 0 400 260" aria-hidden="true" class="mapa__trazo">
+        <path d="M0 150c60-18 120-24 180-12s130 30 220 6" />
+        <path d="M0 186c70-14 140-16 210-4s120 22 190 4" />
+      </svg>
+      <p>La ubicación del muelle te la enviamos por WhatsApp.</p>
+    </div>
+  </div>
+
+  <Despedida />
+
+  <footer class="marco pie">
+    <Logo ancho={110} />
+    <p>Embalse de Guatapé, Antioquia, Colombia.</p>
+  </footer>
+</section>
+
+<style>
+  .contacto {
+    padding-bottom: calc(var(--s-9) + 72px);
+  }
+
+  .contacto__marco {
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .contacto__texto {
+    display: grid;
+    gap: var(--s-6);
+    align-content: start;
+  }
+
+  .contacto .titulo {
+    color: var(--espuma);
+  }
+
+  .redes {
+    display: grid;
+    border-top: 1px solid color-mix(in srgb, var(--agua) 45%, transparent);
+  }
+
+  .redes li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-4);
+    min-height: 56px;
+    border-bottom: 1px solid color-mix(in srgb, var(--agua) 45%, transparent);
+  }
+
+  .redes__nombre {
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+  }
+
+  .redes a {
+    color: var(--espuma);
+    padding-block: var(--s-3);
+  }
+
+  .mapa {
+    position: relative;
+    display: grid;
+    align-content: end;
+    min-height: 260px;
+    padding: var(--s-5);
+    border: 1px solid color-mix(in srgb, var(--agua) 45%, transparent);
+    border-radius: var(--r-foto);
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+    overflow: hidden;
+  }
+
+  .mapa__trazo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--agua);
+    stroke-width: 1;
+    opacity: 0.6;
+  }
+
+  .mapa p {
+    position: relative;
+    max-width: 30ch;
+  }
+
+  .pie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--s-5);
+    margin-top: var(--s-8);
+    padding-top: var(--s-6);
+    border-top: 1px solid color-mix(in srgb, var(--agua) 30%, transparent);
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+  }
+
+  @media (min-width: 1000px) {
+    .contacto__marco {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 24px;
+    }
+    .contacto__texto {
+      grid-column: 1 / span 5;
+    }
+    .mapa {
+      grid-column: 7 / -1;
+      min-height: 380px;
+    }
+  }
+</style>

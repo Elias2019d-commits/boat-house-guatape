@@ -1,0 +1,98 @@
+---
+import { Picture } from 'astro:assets';
+import TituloAgua from '../TituloAgua.astro';
+import { titulos, casa } from '../../data/fotos';
+---
+
+<section id="la-casa" class="seccion" aria-labelledby="titulo-casa" data-momento="manana">
+  <TituloAgua foto={titulos.casa} texto="La casa" id="titulo-casa" />
+
+  <div class="marco seccion__cuerpo casa">
+    <div class="casa__texto" data-revelar="grupo">
+      <p class="sub">Dos niveles sobre el agua, solo para ustedes dos.</p>
+      <p class="texto">
+        Ventanales de piso a techo, un jacuzzi privado en la cubierta y una terraza arriba con vista abierta al embalse
+        y a la Piedra del Peñol. Adentro, cama queen y la cocina lista para el desayuno.
+      </p>
+    </div>
+
+    <figure class="casa__foto casa__foto--grande" data-revelar="foto">
+      <Picture
+        src={casa.interior.src}
+        alt={casa.interior.alt}
+        formats={['avif', 'webp']}
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 900px) 50vw, 100vw"
+      />
+    </figure>
+    <figure class="casa__foto casa__foto--chica" data-revelar="foto" style="--retraso:200ms">
+      <Picture
+        src={casa.estructura.src}
+        alt={casa.estructura.alt}
+        formats={['avif', 'webp']}
+        widths={[400, 640, 960]}
+        sizes="(min-width: 900px) 26vw, 70vw"
+      />
+    </figure>
+  </div>
+</section>
+
+<style>
+  .casa {
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .casa__texto {
+    display: grid;
+    gap: var(--s-5);
+    align-content: start;
+    color: var(--noche);
+  }
+
+  .casa__texto .sub {
+    color: var(--embalse);
+    max-width: 20ch;
+  }
+
+  .casa__foto {
+    overflow: hidden;
+    border-radius: var(--r-foto);
+  }
+
+  .casa__foto :global(img) {
+    width: 100%;
+  }
+
+  .casa__foto--chica {
+    width: 72%;
+    justify-self: end;
+    margin-top: calc(var(--s-6) * -1);
+  }
+
+  @media (min-width: 900px) {
+    .casa {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 24px;
+      row-gap: 0;
+    }
+    .casa__texto {
+      grid-column: 1 / span 5;
+      grid-row: 1 / span 2;
+      position: sticky;
+      top: 120px;
+      align-self: start;
+    }
+    .casa__foto--grande {
+      grid-column: 7 / -1;
+      grid-row: 1;
+    }
+    .casa__foto--chica {
+      grid-column: 7 / span 4;
+      grid-row: 2;
+      width: auto;
+      justify-self: stretch;
+      margin-top: var(--s-6);
+    }
+  }
+</style>

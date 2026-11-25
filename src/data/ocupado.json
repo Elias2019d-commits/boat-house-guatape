@@ -1,0 +1,6 @@
+{
+  "fuente": "manual",
+  "actualizado": "2026-11-24",
+  "nota": "Cada fecha es una noche ocupada (la noche que empieza ese día), formato AAAA-MM-DD. TODO(clienta): cargar las reservas reales o configurar ICAL_URL.",
+  "noches": []
+}

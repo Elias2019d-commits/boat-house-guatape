@@ -1,0 +1,96 @@
+---
+/**
+ * Botón flotante de reservar en celular. Va abajo a la izquierda para no tapar
+ * el botón de WhatsApp del sistema. Aparece al pasar la portada y se oculta
+ * mientras la reserva está a la vista.
+ */
+---
+
+<a href="#reserva" class="boton flotante" data-flotante data-oculto>Reservar</a>
+
+<style>
+  .flotante {
+    position: fixed;
+    left: var(--gutter);
+    bottom: calc(var(--s-4) + env(safe-area-inset-bottom));
+    z-index: 30;
+    min-height: 48px;
+    padding-inline: var(--s-6);
+    box-shadow: var(--sombra-flotante);
+    transition:
+      transform var(--d-corta) var(--ease-out),
+      opacity var(--d-corta) var(--ease-out);
+  }
+
+  .flotante[data-oscuro] {
+    --fondo: var(--ocaso);
+    --tinta: var(--noche);
+  }
+
+  .flotante[data-oculto] {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    visibility: hidden;
+    transition:
+      transform var(--d-corta) var(--ease-out),
+      opacity var(--d-corta) var(--ease-out),
+      visibility 0s linear var(--d-corta);
+  }
+
+  @media (min-width: 900px) {
+    .flotante {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const b = document.querySelector<HTMLElement>('[data-flotante]')!;
+  const portada = document.getElementById('inicio')!;
+  const reserva = document.getElementById('reserva')!;
+  const oscuras = [...document.querySelectorAll<HTMLElement>('.seccion[data-tono="oscuro"]')];
+  let pasoPortada = false;
+  let enReserva = false;
+  let bajando = false;
+  let ultimoY = scrollY;
+
+  function actualizar() {
+    // se esconde mientras bajas leyendo y vuelve cuando subes
+    const ocultar = !pasoPortada || enReserva || bajando;
+    b.toggleAttribute('data-oculto', ocultar);
+    if (ocultar) b.setAttribute('tabindex', '-1');
+    else b.removeAttribute('tabindex');
+  }
+
+  new IntersectionObserver(([x]) => {
+    pasoPortada = !x.isIntersecting;
+    actualizar();
+  }).observe(portada);
+  new IntersectionObserver(([x]) => {
+    enReserva = x.isIntersecting;
+    actualizar();
+  }, { rootMargin: '0px 0px -30% 0px' }).observe(reserva);
+
+  // tono: Ocaso sobre fondos oscuros
+  addEventListener(
+    'scroll',
+    () => {
+      const y = scrollY;
+      if (Math.abs(y - ultimoY) > 6) {
+        const nuevo = y > ultimoY;
+        if (nuevo !== bajando) {
+          bajando = nuevo;
+          actualizar();
+        }
+        ultimoY = y;
+      }
+      const alguna = oscuras.some((s) => {
+        const r = s.getBoundingClientRect();
+        return r.top < innerHeight - 40 && r.bottom > innerHeight - 40;
+      });
+      b.toggleAttribute('data-oscuro', alguna);
+    },
+    { passive: true },
+  );
+</script>

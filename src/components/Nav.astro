@@ -1,0 +1,333 @@
+---
+import Logo from './Logo.astro';
+
+const links = [
+  { href: '#la-casa', texto: 'La casa' },
+  { href: '#que-incluye', texto: 'Qué incluye' },
+  { href: '#galeria', texto: 'Galería' },
+  { href: '#preguntas', texto: 'Preguntas' },
+];
+---
+
+<header class="nav" data-nav data-sobre-foto>
+  <div class="marco nav__fila">
+    <a href="#inicio" class="nav__logo" aria-label="Boat House Guatapé, ir al inicio">
+      <Logo ancho={96} />
+    </a>
+    <nav aria-label="Principal" class="nav__links">
+      <ul role="list">
+        {links.map((l) => <li><a href={l.href}>{l.texto}</a></li>)}
+      </ul>
+    </nav>
+    <a href="#reserva" class="boton nav__reservar" data-iman>Reservar</a>
+    <button class="nav__menu" type="button" aria-expanded="false" aria-controls="menu-movil" data-menu-abrir>
+      <span class="visually-hidden">Abrir menú</span>
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+        <path d="M4 10h20M4 18h20" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+  <span class="nav__progreso" aria-hidden="true" data-progreso-pagina></span>
+</header>
+
+<div id="menu-movil" class="hoja" data-tono="oscuro" hidden data-menu>
+  <div class="marco hoja__fila">
+    <Logo ancho={96} />
+    <button type="button" class="nav__menu" data-menu-cerrar>
+      <span class="visually-hidden">Cerrar menú</span>
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+        <path d="M7 7l14 14M21 7 7 21" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+  <nav aria-label="Menú" class="marco hoja__nav">
+    <ul role="list">
+      {links.map((l) => <li><a href={l.href} data-menu-link>{l.texto}</a></li>)}
+      <li><a href="#como-llegar" data-menu-link>Cómo llegar</a></li>
+    </ul>
+    <a href="#reserva" class="boton boton--ocaso" data-menu-link>Ver fechas disponibles</a>
+  </nav>
+</div>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 40;
+    color: var(--noche);
+    padding-top: env(safe-area-inset-top);
+    transition: transform var(--d-media) var(--ease-out);
+  }
+
+  /* fondo en capa aparte: se funde solo con opacity */
+  .nav::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--bruma) 94%, transparent);
+    border-bottom: var(--linea);
+    opacity: 1;
+    transition: opacity var(--d-media) var(--ease-out);
+  }
+
+  .nav[data-sobre-foto] {
+    color: var(--espuma);
+  }
+
+  /* se esconde al bajar leyendo y vuelve al subir */
+  .nav.oculta {
+    transform: translateY(-101%);
+  }
+
+  .nav {
+    transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* la línea del agua avanza con el recorrido de la página */
+  .nav__progreso {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.55;
+    transform: scaleX(var(--avance, 0));
+    transform-origin: 0 50%;
+  }
+
+  .nav[data-sobre-foto]::before {
+    opacity: 0;
+  }
+
+  .nav[data-oscuro] {
+    color: var(--bruma);
+  }
+
+  .nav[data-oscuro]::before {
+    background: color-mix(in srgb, var(--noche) 94%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--agua) 30%, transparent);
+  }
+
+  .nav__fila {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s-6);
+    min-height: 72px;
+  }
+
+  .nav__logo {
+    display: block;
+    padding-block: var(--s-2);
+    margin-right: auto;
+  }
+
+  .nav__links {
+    display: none;
+  }
+
+  .nav__links ul {
+    display: flex;
+    gap: var(--s-6);
+  }
+
+  .nav__links a {
+    position: relative;
+    display: block;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    padding-block: var(--s-3);
+  }
+
+  .nav__links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 6px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--d-corta) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav__links a:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  .nav__reservar {
+    display: none;
+    min-height: 40px;
+    padding-inline: var(--s-5);
+    font-size: 0.9375rem;
+  }
+
+  .nav[data-sobre-foto] .nav__reservar {
+    --fondo: var(--espuma);
+    --tinta: var(--embalse);
+  }
+
+  .nav[data-oscuro] .nav__reservar {
+    --fondo: var(--ocaso);
+    --tinta: var(--noche);
+  }
+
+  .nav__menu {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    margin-right: -10px;
+  }
+
+  @media (min-width: 900px) {
+    .nav__links,
+    .nav__reservar {
+      display: block;
+    }
+    .nav__reservar {
+      display: inline-flex;
+    }
+    .nav__menu {
+      display: none;
+    }
+  }
+
+  /* hoja del menú en celular */
+  .hoja {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: var(--noche);
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: calc(var(--s-7) + env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
+  }
+
+  .hoja[hidden] {
+    display: none;
+  }
+
+  .hoja.abierta {
+    animation: hoja var(--d-media) var(--ease-out);
+  }
+
+  @keyframes hoja {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .hoja__fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 72px;
+    padding-block: var(--s-2);
+  }
+
+  .hoja__nav {
+    margin-top: auto;
+    display: grid;
+    gap: var(--s-7);
+  }
+
+  .hoja__nav ul {
+    display: grid;
+    gap: var(--s-1);
+  }
+
+  .hoja__nav li a {
+    display: block;
+    padding-block: var(--s-2);
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 2rem;
+    line-height: 1.2;
+    text-decoration: none;
+  }
+
+  .hoja__nav .boton {
+    justify-self: start;
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]')!;
+  const menu = document.querySelector<HTMLElement>('[data-menu]')!;
+  const abrir = document.querySelector<HTMLButtonElement>('[data-menu-abrir]')!;
+  const cerrar = document.querySelector<HTMLButtonElement>('[data-menu-cerrar]')!;
+
+  function abrirMenu() {
+    menu.hidden = false;
+    menu.classList.add('abierta');
+    abrir.setAttribute('aria-expanded', 'true');
+    document.documentElement.style.overflow = 'hidden';
+    cerrar.focus();
+  }
+  function cerrarMenu(volverFoco = true) {
+    menu.hidden = true;
+    menu.classList.remove('abierta');
+    abrir.setAttribute('aria-expanded', 'false');
+    document.documentElement.style.overflow = '';
+    if (volverFoco) abrir.focus();
+  }
+  abrir.addEventListener('click', abrirMenu);
+  cerrar.addEventListener('click', () => cerrarMenu());
+  menu.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => cerrarMenu(false)));
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cerrarMenu();
+    if (e.key === 'Tab') {
+      const foc = [...menu.querySelectorAll<HTMLElement>('a, button')];
+      const primero = foc[0];
+      const ultimo = foc[foc.length - 1];
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault();
+        primero.focus();
+      }
+    }
+  });
+
+  // Tono de la barra según lo que tenga debajo: foto, claro u oscuro.
+  const escenas = [...document.querySelectorAll<HTMLElement>('[data-escena]')];
+  const oscuras = [...document.querySelectorAll<HTMLElement>('[data-tono="oscuro"].seccion')];
+  function tono() {
+    const y = 36;
+    const sobre = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      return r.top <= y && r.bottom >= y;
+    };
+    const enFoto = escenas.some(sobre);
+    const enOscuro = !enFoto && oscuras.some(sobre);
+    nav.toggleAttribute('data-sobre-foto', enFoto);
+    nav.toggleAttribute('data-oscuro', enOscuro);
+    nav.toggleAttribute('data-tono', false);
+    if (enOscuro || enFoto) nav.setAttribute('data-tono', 'oscuro');
+  }
+  const progreso = nav.querySelector<HTMLElement>('[data-progreso-pagina]')!;
+  let ultimoY = scrollY;
+  function alScroll() {
+    tono();
+    const y = scrollY;
+    const total = document.documentElement.scrollHeight - innerHeight;
+    progreso.style.setProperty('--avance', (total > 0 ? y / total : 0).toFixed(4));
+    if (Math.abs(y - ultimoY) > 8) {
+      const bajando = y > ultimoY && y > 160;
+      nav.classList.toggle('oculta', bajando && abrir.getAttribute('aria-expanded') !== 'true');
+      ultimoY = y;
+    }
+  }
+  addEventListener('scroll', alScroll, { passive: true });
+  // si el foco entra en la barra, que se vea
+  nav.addEventListener('focusin', () => nav.classList.remove('oculta'));
+  alScroll();
+</script>

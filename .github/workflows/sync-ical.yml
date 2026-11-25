@@ -1,0 +1,46 @@
+name: Sincronizar ocupación (iCal)
+
+# Cada 3 horas lee el calendario de reservas (secret ICAL_URL), actualiza
+# src/data/ocupado.json y, si cambió, publica el sitio de nuevo.
+# Sin el secret ICAL_URL no hace nada.
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    outputs:
+      cambio: ${{ steps.cambios.outputs.cambio }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Leer el calendario
+        env:
+          ICAL_URL: ${{ secrets.ICAL_URL }}
+        run: node scripts/ical-a-ocupado.mjs
+      - id: cambios
+        run: |
+          if git diff --quiet -- src/data/ocupado.json; then
+            echo "cambio=no" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -am "Actualizar ocupación desde el calendario"
+            git push
+            echo "cambio=si" >> "$GITHUB_OUTPUT"
+          fi
+
+  publicar:
+    needs: sync
+    if: needs.sync.outputs.cambio == 'si'
+    uses: ./.github/workflows/deploy.yml

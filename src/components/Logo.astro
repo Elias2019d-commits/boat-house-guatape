@@ -1,0 +1,25 @@
+---
+/**
+ * Logo en una sola tinta: toma el color del texto (currentColor) con una máscara,
+ * así un único archivo sirve para Noche, Embalse o Espuma.
+ * TODO(clienta): reemplazar public/logo.svg por el vector original cuando llegue.
+ */
+interface Props {
+  ancho?: number;
+  class?: string;
+}
+const { ancho = 104, class: cls } = Astro.props;
+---
+
+<span class:list={['logo', cls]} role="img" aria-label="Boat House Guatapé" style={`--w:${Math.max(90, ancho)}px`}></span>
+
+<style>
+  .logo {
+    display: block;
+    width: var(--w);
+    aspect-ratio: 402 / 300;
+    background-color: currentColor;
+    -webkit-mask: var(--logo) center / contain no-repeat;
+    mask: var(--logo) center / contain no-repeat;
+  }
+</style>

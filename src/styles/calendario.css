@@ -1,0 +1,230 @@
+/* Calendario de reserva (se dibuja con JS, por eso los estilos son globales) */
+.cal__cabeza {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  margin-bottom: var(--s-3);
+}
+
+.cal__titulo {
+  margin-right: auto;
+  font-weight: 550;
+  color: var(--espuma);
+}
+
+.cal__titulo::first-letter {
+  text-transform: uppercase;
+}
+
+.cal__nav {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-pill);
+  color: var(--espuma);
+  transition:
+    transform var(--d-toque) var(--ease-out),
+    opacity var(--d-corta) var(--ease-out);
+}
+
+.cal__nav:active {
+  transform: scale(0.94);
+}
+
+.cal__nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.cal__meses {
+  display: grid;
+  gap: var(--s-7);
+}
+
+@media (min-width: 1280px) {
+  .cal__meses {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-6);
+  }
+}
+
+.cal__nombre {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .cal__nombre {
+    display: block;
+    margin-bottom: var(--s-2);
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+  }
+  .cal__nombre::first-letter {
+    text-transform: uppercase;
+  }
+  .cal__titulo {
+    visibility: hidden;
+  }
+}
+
+.cal__mes table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px 3px;
+  table-layout: fixed;
+}
+
+.cal__mes th {
+  padding-bottom: var(--s-2);
+  font-size: 0.75rem;
+  font-weight: 450;
+  text-align: center;
+  color: color-mix(in srgb, var(--bruma) 80%, transparent);
+}
+
+.cal__mes td {
+  padding: 0;
+}
+
+.dia {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1px;
+  width: 100%;
+  min-height: 52px;
+  isolation: isolate;
+  border-radius: var(--r-campo);
+  color: var(--espuma);
+  font-variant-numeric: tabular-nums;
+  transition:
+    transform var(--d-toque) var(--ease-out),
+    opacity var(--d-corta) var(--ease-out);
+}
+
+/* fondo de estado en capa propia: cambia con opacity */
+.dia::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--bruma);
+  opacity: 0;
+  transition: opacity var(--d-corta) var(--ease-out);
+  z-index: -1;
+}
+
+.dia:active:not([aria-disabled='true']) {
+  transform: scale(0.94);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dia:not([aria-disabled='true']):hover::before {
+    opacity: 0.12;
+  }
+}
+
+.dia__num {
+  font-size: 0.9375rem;
+  line-height: 1.1;
+}
+
+.dia__precio {
+  font-size: var(--t-mini);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--bruma) 78%, transparent);
+}
+
+.dia__precio--finde,
+.dia__precio--especial {
+  color: var(--espuma);
+  font-weight: 600;
+}
+
+.dia--hoy .dia__num {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.dia[aria-disabled='true'] {
+  cursor: default;
+}
+
+.dia--pasada {
+  opacity: 0.32;
+}
+
+.dia--ocupada .dia__num {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  color: color-mix(in srgb, var(--bruma) 55%, transparent);
+}
+
+.dia--ocupada::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--agua) 45%, transparent);
+}
+
+.dia--rango::before {
+  opacity: 0.16;
+}
+
+.dia--inicio,
+.dia--fin {
+  color: var(--noche);
+}
+
+.dia--inicio::before,
+.dia--fin::before {
+  opacity: 1;
+}
+
+.dia--inicio .dia__precio,
+.dia--fin .dia__precio {
+  color: var(--embalse);
+}
+
+.dia--fin .dia__precio {
+  visibility: hidden;
+}
+
+.dia:focus-visible {
+  outline: 2px solid var(--ocaso);
+  outline-offset: 1px;
+  z-index: 1;
+}
+
+/* al elegir la salida, el rango se llena noche por noche */
+[data-anim='rango'] .dia--rango::before {
+  animation: llena 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--k, 0) * 45ms);
+}
+
+[data-anim='rango'] .dia--fin::before {
+  animation: marca 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 120ms;
+}
+
+[data-anim] .dia--inicio::before {
+  animation: marca 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes llena {
+  from {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+}
+
+@keyframes marca {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}

@@ -1,0 +1,134 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/movimiento.css';
+import Intro from '../components/Intro.astro';
+import { getImage } from 'astro:assets';
+import portada from '../assets/fotos/casa-amanecer.jpg';
+import precios from '../data/precios.json';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const canonical = new URL(base, Astro.site);
+const og = await getImage({ src: portada, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+const ogUrl = new URL(og.src, Astro.site);
+
+const conPrecio = precios.planes.filter((p) => p.semana != null && p.finde != null);
+const minimo = Math.min(...conPrecio.map((p) => p.semana as number));
+const maximo = Math.max(...conPrecio.map((p) => p.finde as number));
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'LodgingBusiness',
+  name: 'Boat House Guatapé',
+  description,
+  url: canonical.href,
+  image: ogUrl.href,
+  telephone: '+57 311 719 7851',
+  // TODO(clienta): dirección exacta del muelle.
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Guatapé',
+    addressRegion: 'Antioquia',
+    addressCountry: 'CO',
+  },
+  checkinTime: '15:00',
+  checkoutTime: '12:00',
+  priceRange: `$${minimo.toLocaleString('es-CO')} – $${maximo.toLocaleString('es-CO')} COP por pareja, por noche`,
+  currenciesAccepted: 'COP',
+  amenityFeature: [
+    'Jacuzzi privado',
+    'Traslado en lancha',
+    'Kayak',
+    'Paddle board',
+    'Wifi',
+    'Zona BBQ',
+    'Cocina dotada',
+  ].map((name) => ({ '@type': 'LocationFeatureSpecification', name, value: true })),
+  makesOffer: conPrecio.map((p) => ({
+    '@type': 'Offer',
+    name: p.nombre,
+    priceCurrency: 'COP',
+    price: p.semana,
+    description: `Por pareja, por noche. Semana $${(p.semana as number).toLocaleString('es-CO')}, fin de semana $${(p.finde as number).toLocaleString('es-CO')}.`,
+  })),
+  sameAs: ['https://www.instagram.com/boat_house_guatape/', 'https://www.tiktok.com/@boat.house.guatape'],
+};
+
+const fuentes = `
+@font-face{font-family:'Spectral';font-style:normal;font-weight:200;font-display:swap;src:url(${base}fonts/spectral-latin-200-normal.woff2) format('woff2')}
+@font-face{font-family:'Spectral';font-style:normal;font-weight:300;font-display:swap;src:url(${base}fonts/spectral-latin-300-normal.woff2) format('woff2')}
+@font-face{font-family:'Spectral';font-style:italic;font-weight:300;font-display:swap;src:url(${base}fonts/spectral-latin-300-italic.woff2) format('woff2')}
+@font-face{font-family:'Spectral';font-style:normal;font-weight:400;font-display:swap;src:url(${base}fonts/spectral-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:100 900;font-display:swap;src:url(${base}fonts/hanken-grotesk-latin-wght-normal.woff2) format('woff2-variations')}
+:root{--logo:url(${base}logo.svg)}
+`;
+---
+
+<!doctype html>
+<html lang="es-CO">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <meta name="theme-color" content="#13201D" />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="sitemap" href={`${base}sitemap-index.xml`} />
+
+    <link rel="preload" href={`${base}fonts/spectral-latin-200-normal.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}fonts/hanken-grotesk-latin-wght-normal.woff2`} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={fuentes}></style>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:site_name" content="Boat House Guatapé" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogUrl.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="La casa flotante Boat House al amanecer, sobre el embalse de Guatapé." />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        d.classList.add('movido');
+        try {
+          if (!sessionStorage.getItem('bh-intro')) d.classList.add('con-intro');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Ir al contenido</a>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <filter id="onda" x="-5%" y="-20%" width="110%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.006 0.09" numOctaves="1" seed="7" />
+        <feDisplacementMap in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <filter id="onda-viva" x="-5%" y="-20%" width="110%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.006 0.09" numOctaves="1" seed="7">
+          <animate attributeName="baseFrequency" dur="9s" values="0.006 0.09;0.008 0.11;0.006 0.09" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="6" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+    <Intro />
+    <slot />
+    <script>
+      import '../scripts/movimiento';
+    </script>
+  </body>
+</html>

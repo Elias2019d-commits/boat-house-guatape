@@ -1,0 +1,188 @@
+---
+import Icono from '../Icono.astro';
+
+const preguntas = [
+  {
+    p: '¿Cómo se llega?',
+    r: 'El traslado en lancha está incluido. Te pasamos el punto de encuentro por WhatsApp cuando confirmes tu reserva.',
+  },
+  {
+    p: '¿Qué actividades incluye?',
+    r: 'Kayak, paddle board y la malla catamarán, a la hora que quieras, además del jacuzzi privado. El jet ski va aparte, en el Extreme Plan.',
+  },
+  { p: '¿Tiene wifi?', r: 'Sí. La casa tiene wifi y TV.' },
+  { p: '¿Hay dónde poner música?', r: 'Sí, hay un parlante JBL. Conectas tu celular y listo.' },
+  {
+    p: '¿Tenemos que llevar bebidas?',
+    r: 'No hace falta. Hay mini-bar con bebidas y mecato, con costo adicional. Si quieres, también puedes llevar lo tuyo.',
+  },
+  { p: 'Horarios', r: 'El check-in es a las 3:00 p. m. y el check-out a las 12:00 m.' },
+];
+// TODO(clienta): persona adicional y política de cancelación (sumar como preguntas cuando estén definidas).
+---
+
+<section id="preguntas" class="seccion preguntas" aria-labelledby="titulo-preguntas" data-momento="noche" data-tono="oscuro">
+  <div class="marco preguntas__marco">
+    <h2 id="titulo-preguntas" class="titulo" data-revelar="sube">Preguntas</h2>
+    <div class="acordeon" data-acordeon data-revelar="grupo">
+      {
+        preguntas.map((q, i) => (
+          <div class="acordeon__item">
+            <h3 class="acordeon__h">
+              <button
+                type="button"
+                class="acordeon__boton"
+                aria-expanded="false"
+                aria-controls={`respuesta-${i}`}
+                id={`pregunta-${i}`}
+              >
+                <span>{q.p}</span>
+                <Icono nombre="mas" />
+              </button>
+            </h3>
+            <div class="acordeon__panel" id={`respuesta-${i}`} role="region" aria-labelledby={`pregunta-${i}`}>
+              <div class="acordeon__interior">
+                <p>{q.r}</p>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .preguntas__marco {
+    display: grid;
+    gap: var(--s-7);
+  }
+
+  .preguntas .titulo {
+    color: var(--espuma);
+  }
+
+  .acordeon {
+    border-top: 1px solid color-mix(in srgb, var(--agua) 45%, transparent);
+    max-width: 52rem;
+  }
+
+  .acordeon__item {
+    border-bottom: 1px solid color-mix(in srgb, var(--agua) 45%, transparent);
+  }
+
+  .acordeon__h {
+    font: inherit;
+  }
+
+  .acordeon__boton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+    width: 100%;
+    min-height: 64px;
+    padding-block: var(--s-4);
+    text-align: left;
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 1.375rem;
+    line-height: 1.3;
+    color: var(--espuma);
+  }
+
+  .acordeon__boton :global(.icono) {
+    flex: none;
+    color: var(--bruma);
+    transition: transform var(--d-media) var(--ease-out);
+  }
+
+  .acordeon__boton[aria-expanded='true'] :global(.icono) {
+    transform: rotate(135deg);
+    color: var(--espuma);
+  }
+
+  .acordeon__boton span {
+    transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .acordeon__boton[aria-expanded='true'] span {
+    transform: translateX(8px);
+  }
+
+  /* la altura se despliega (grid 0fr → 1fr) y el texto aparece un instante después */
+  .acordeon__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition:
+      grid-template-rows 420ms cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s linear 420ms;
+  }
+
+  .acordeon__panel.abierto {
+    transition:
+      grid-template-rows 420ms cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s linear 0s;
+  }
+
+  .acordeon__panel.abierto {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+
+  .acordeon__interior {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .acordeon__interior p {
+    padding-bottom: var(--s-5);
+    max-width: 58ch;
+    color: var(--bruma);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 400ms var(--ease-out),
+      transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .acordeon__panel.abierto p {
+    transition-delay: 120ms;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* sin JS: todo abierto */
+  :global(html:not(.js)) .acordeon__panel {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+  :global(html:not(.js)) .acordeon__interior p {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (min-width: 1000px) {
+    .preguntas__marco {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 24px;
+    }
+    .preguntas .titulo {
+      grid-column: 1 / span 4;
+    }
+    .acordeon {
+      grid-column: 5 / -1;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-acordeon] .acordeon__boton').forEach((b) => {
+    b.addEventListener('click', () => {
+      const abierto = b.getAttribute('aria-expanded') === 'true';
+      b.setAttribute('aria-expanded', String(!abierto));
+      document.getElementById(b.getAttribute('aria-controls')!)!.classList.toggle('abierto', !abierto);
+    });
+  });
+</script>

@@ -1,0 +1,423 @@
+---
+import { Picture } from 'astro:assets';
+import TituloAgua from '../TituloAgua.astro';
+import Icono from '../Icono.astro';
+import EscenaIncluye from '../EscenaIncluye.astro';
+import { titulos, incluyeFotos } from '../../data/fotos';
+
+const incluye = [
+  { icono: 'lancha', texto: 'Traslado en lancha' },
+  { icono: 'jacuzzi', texto: 'Jacuzzi privado' },
+  { icono: 'desayuno', texto: 'Ingredientes para el desayuno' },
+  { icono: 'kayak', texto: 'Kayak' },
+  { icono: 'paddle', texto: 'Paddle board' },
+  { icono: 'malla', texto: 'Malla catamarán' },
+  { icono: 'bbq', texto: 'Zona BBQ' },
+  { icono: 'cocina', texto: 'Cocina dotada' },
+  { icono: 'wifi', texto: 'Wifi y TV' },
+  { icono: 'parlante', texto: 'Parlante JBL' },
+  { icono: 'cama', texto: 'Cama queen' },
+] as const;
+---
+
+<section id="que-incluye" class="seccion" aria-labelledby="titulo-incluye" data-momento="dia">
+  <TituloAgua foto={titulos.incluye} texto="Qué incluye" id="titulo-incluye" alto="72svh" />
+
+  <div class="marco seccion__cuerpo incluye">
+    <div class="incluye__intro" data-revelar="grupo">
+      <p class="sub">Por pareja, por noche.</p>
+      <dl class="horarios">
+        <div>
+          <dt>Check-in</dt>
+          <dd>3:00 p. m.</dd>
+        </div>
+        <div>
+          <dt>Check-out</dt>
+          <dd>12:00 m.</dd>
+        </div>
+      </dl>
+      <p class="adicional">
+        <Icono nombre="minibar" />
+        <span>Con costo adicional: mini-bar con bebidas y mecato.</span>
+      </p>
+    </div>
+
+    <!-- recorrido: al bajar por la lista, cada ítem se ilumina y la foto cambia -->
+    <div class="escenario" data-escenario>
+      <figure class="visor-incluye" aria-hidden="true">
+        {
+          incluye.map((i, k) => {
+            const f = incluyeFotos[i.icono];
+            return (
+              <div
+                class:list={['visor-incluye__foto', { arriba: k === 0 }]}
+                data-clave={i.icono}
+                style={f?.pos ? `--pos:${f.pos}` : undefined}
+              >
+                {f ? (
+                  <Picture
+                    src={f.src}
+                    alt=""
+                    formats={['avif', 'webp']}
+                    widths={[480, 800, 1200]}
+                    sizes="(min-width: 1000px) 46vw, 100vw"
+                    loading="lazy"
+                  />
+                ) : (
+                  <EscenaIncluye clave={i.icono as 'lancha' | 'desayuno' | 'parlante'} />
+                )}
+              </div>
+            );
+          })
+        }
+        <figcaption class="visor-incluye__pie">
+          <span class="visor-incluye__nombre" data-nombre>{incluye[0].texto}</span>
+        </figcaption>
+      </figure>
+
+      <ul role="list" class="lista-incluye" data-revelar="grupo" data-dibujar>
+        {
+          incluye.map((i, k) => (
+            <li class:list={{ activa: k === 0 }} data-item={i.icono}>
+              <Icono nombre={i.icono} tam={28} />
+              <span class="lista-incluye__texto">{i.texto}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .incluye {
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .incluye__intro {
+    display: grid;
+    gap: var(--s-6);
+    align-content: start;
+  }
+
+  .incluye__intro .sub {
+    color: var(--embalse);
+  }
+
+  .horarios {
+    display: flex;
+    gap: var(--s-7);
+    margin: 0;
+  }
+
+  .horarios dt {
+    font-size: var(--t-detalle);
+    color: var(--embalse);
+  }
+
+  .horarios dd {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: var(--t-sub);
+    line-height: 1.2;
+    color: var(--noche);
+    font-variant-numeric: lining-nums;
+  }
+
+  .adicional {
+    display: flex;
+    gap: var(--s-3);
+    align-items: start;
+    max-width: 30ch;
+    padding: var(--s-4) var(--s-5);
+    background: var(--espuma);
+    border-radius: var(--r-foto);
+    color: var(--teca);
+    font-size: var(--t-detalle);
+    line-height: 1.5;
+  }
+
+  .adicional :global(.icono) {
+    flex: none;
+    margin-top: -2px;
+  }
+
+  /* ---------- escenario ---------- */
+  .escenario {
+    position: relative;
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .visor-incluye {
+    position: sticky;
+    top: var(--s-3);
+    z-index: 2;
+    margin: 0 calc(var(--gutter) * -1);
+    height: 42svh;
+    min-height: 260px;
+    overflow: hidden;
+    background: var(--noche);
+  }
+
+  .visor-incluye__foto {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  .visor-incluye__foto :global(picture),
+  .visor-incluye__foto :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .visor-incluye__foto :global(img) {
+    object-fit: cover;
+    object-position: var(--pos, 50% 50%);
+  }
+
+  .visor-incluye__foto.abajo {
+    opacity: 1;
+    z-index: 1;
+  }
+
+  .visor-incluye__foto.arriba {
+    opacity: 1;
+    z-index: 2;
+  }
+
+  /* la foto nueva se abre desde el horizonte sobre la anterior */
+  .visor-incluye__foto.arriba.entra {
+    animation: abre-horizonte 1100ms cubic-bezier(0.76, 0, 0.18, 1) both;
+  }
+
+  .visor-incluye__foto.arriba.entra :global(img) {
+    animation: acerca 1800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes abre-horizonte {
+    from {
+      clip-path: inset(50% 0 50% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes acerca {
+    from {
+      transform: scale(1.2);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  .visor-incluye__pie {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    padding: var(--s-8) var(--gutter) var(--s-4);
+    background: linear-gradient(to top, rgb(19 32 29 / 0.6), rgb(19 32 29 / 0));
+    overflow: hidden;
+  }
+
+  .visor-incluye__nombre {
+    display: block;
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: var(--t-sub);
+    line-height: 1.2;
+    color: var(--espuma);
+  }
+
+  .visor-incluye__nombre.cambia {
+    animation: nombre 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes nombre {
+    from {
+      transform: translateY(110%);
+      opacity: 0;
+    }
+  }
+
+  /* ---------- lista ---------- */
+  .lista-incluye {
+    padding-bottom: 24svh;
+  }
+
+  .lista-incluye li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+    min-height: 68px;
+    border-top: var(--linea);
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 1.25rem;
+    line-height: 1.3;
+    color: color-mix(in srgb, var(--embalse) 80%, var(--velo));
+    cursor: default;
+  }
+
+  .lista-incluye li:last-child {
+    border-bottom: var(--linea);
+  }
+
+  /* la línea del ítem activo se traza de izquierda a derecha */
+  .lista-incluye li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 1px;
+    background: var(--embalse);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    transition: transform 800ms cubic-bezier(0.76, 0, 0.18, 1);
+  }
+
+  .lista-incluye :global(.icono) {
+    flex: none;
+    color: var(--agua);
+    transition:
+      transform 600ms cubic-bezier(0.16, 1, 0.3, 1),
+      color 500ms ease;
+  }
+
+  .lista-incluye__texto {
+    transition:
+      transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
+      color 500ms ease;
+  }
+
+  .lista-incluye li.activa {
+    color: var(--noche);
+  }
+
+  .lista-incluye li.activa::after {
+    transform: scaleX(1);
+  }
+
+  .lista-incluye li.activa :global(.icono) {
+    color: var(--embalse);
+    transform: scale(1.12);
+  }
+
+  .lista-incluye li.activa .lista-incluye__texto {
+    transform: translateX(10px);
+  }
+
+  @media (min-width: 1000px) {
+    .incluye__intro {
+      grid-template-columns: 1fr auto auto;
+      align-items: end;
+      column-gap: var(--s-8);
+    }
+
+    .escenario {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 24px;
+      align-items: start;
+    }
+
+    .visor-incluye {
+      grid-column: 1 / span 6;
+      top: 14vh;
+      height: 72vh;
+      margin: 0;
+      border-radius: var(--r-foto);
+    }
+
+    .visor-incluye__pie {
+      padding-inline: var(--s-6);
+    }
+
+    .lista-incluye {
+      grid-column: 8 / -1;
+      padding-top: 18vh;
+      padding-bottom: 30vh;
+    }
+
+    .lista-incluye li {
+      min-height: 84px;
+      font-size: 1.625rem;
+      cursor: pointer;
+    }
+  }
+</style>
+
+<script>
+  const escenario = document.querySelector<HTMLElement>('[data-escenario]')!;
+  const visor = escenario.querySelector<HTMLElement>('.visor-incluye')!;
+  const items = [...escenario.querySelectorAll<HTMLLIElement>('[data-item]')];
+  const fotos = new Map(
+    [...escenario.querySelectorAll<HTMLElement>('[data-clave]')].map((f) => [f.dataset.clave!, f]),
+  );
+  const nombre = escenario.querySelector<HTMLElement>('[data-nombre]')!;
+  const ancho = matchMedia('(min-width: 1000px)');
+  let actual = items[0].dataset.item!;
+
+  function reiniciar(el: HTMLElement, clase: string) {
+    el.classList.remove(clase);
+    void el.offsetWidth;
+    el.classList.add(clase);
+  }
+
+  function activar(clave: string) {
+    if (clave === actual) return;
+    const nueva = fotos.get(clave)!;
+    const vieja = fotos.get(actual)!;
+    fotos.forEach((f) => f.classList.remove('abajo'));
+    vieja.classList.remove('arriba', 'entra');
+    vieja.classList.add('abajo');
+    nueva.classList.add('arriba');
+    reiniciar(nueva, 'entra');
+    items.forEach((li) => li.classList.toggle('activa', li.dataset.item === clave));
+    nombre.textContent = items.find((li) => li.dataset.item === clave)!.textContent!.trim();
+    reiniciar(nombre, 'cambia');
+    actual = clave;
+  }
+
+  // el ítem activo es el que cruza una línea de referencia: el centro de la pantalla
+  // en desktop, o un poco debajo de la foto fija en el celular
+  let enVista = false;
+  new IntersectionObserver(([x]) => (enVista = x.isIntersecting)).observe(escenario);
+
+  function porScroll() {
+    if (!enVista) return;
+    const ref = ancho.matches
+      ? innerHeight * 0.5
+      : visor.getBoundingClientRect().bottom + (innerHeight - visor.getBoundingClientRect().bottom) * 0.28;
+    let mejor = items[0];
+    let dist = Infinity;
+    for (const li of items) {
+      const r = li.getBoundingClientRect();
+      const d = Math.abs(r.top + r.height / 2 - ref);
+      if (d < dist) {
+        dist = d;
+        mejor = li;
+      }
+    }
+    // la foto cambia cuando el ítem se asienta, no con cada uno que pasa en un scroll rápido
+    clearTimeout(espera);
+    const clave = mejor.dataset.item!;
+    items.forEach((li) => li.classList.toggle('activa', li.dataset.item === clave));
+    espera = window.setTimeout(() => activar(clave), 90);
+  }
+  let espera = 0;
+  addEventListener('scroll', porScroll, { passive: true });
+
+  // con mouse, pasar por encima también muestra la foto
+  const fino = matchMedia('(hover: hover) and (pointer: fine)');
+  items.forEach((li) => li.addEventListener('pointerenter', () => ancho.matches && fino.matches && activar(li.dataset.item!)));
+</script>

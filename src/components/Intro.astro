@@ -1,0 +1,118 @@
+---
+/**
+ * Intro de la primera visita: la línea del agua se dibuja, el logo sale de ella con
+ * su reflejo y el horizonte se parte en dos para mostrar la casa. Solo con JS,
+ * solo una vez por sesión y nunca con reduced motion (lo decide el script del <head>).
+ */
+import Logo from './Logo.astro';
+---
+
+<div class="intro" aria-hidden="true" data-intro>
+  <div class="intro__mitad intro__mitad--cielo">
+    <div class="intro__logo"><Logo ancho={150} /></div>
+  </div>
+  <div class="intro__mitad intro__mitad--agua">
+    <div class="intro__logo intro__logo--reflejo"><Logo ancho={150} /></div>
+  </div>
+  <span class="intro__linea"></span>
+</div>
+
+<style>
+  .intro {
+    display: none;
+  }
+
+  :global(html.con-intro) .intro {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  :global(html.con-intro) {
+    overflow: hidden;
+  }
+
+  .intro__mitad {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50.5%;
+    background: var(--noche);
+    overflow: hidden;
+    transition: transform 1200ms cubic-bezier(0.76, 0, 0.18, 1);
+  }
+
+  .intro__mitad--cielo {
+    top: 0;
+  }
+
+  .intro__mitad--agua {
+    bottom: 0;
+  }
+
+  .intro__logo {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    color: var(--espuma);
+    transform: translate(-50%, 100%);
+    animation: logo-sale 1200ms cubic-bezier(0.16, 1, 0.3, 1) 450ms forwards;
+  }
+
+  .intro__logo--reflejo {
+    top: 0;
+    bottom: auto;
+    transform: translate(-50%, -100%) scaleY(-1);
+    opacity: 0.18;
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+    mask-image: linear-gradient(to bottom, #000, transparent 70%);
+    filter: url(#onda-viva);
+    animation-name: reflejo-sale;
+  }
+
+  @keyframes logo-sale {
+    to {
+      transform: translate(-50%, -14px);
+    }
+  }
+
+  @keyframes reflejo-sale {
+    to {
+      transform: translate(-50%, 14px) scaleY(-1);
+    }
+  }
+
+  .intro__linea {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: color-mix(in srgb, var(--espuma) 70%, transparent);
+    transform: scaleX(0);
+    animation: linea-intro 900ms cubic-bezier(0.65, 0, 0.35, 1) 100ms forwards;
+    transition: opacity 500ms ease;
+  }
+
+  @keyframes linea-intro {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* el horizonte se abre */
+  .intro.abre .intro__mitad--cielo {
+    transform: translateY(-100%);
+  }
+
+  .intro.abre .intro__mitad--agua {
+    transform: translateY(100%);
+  }
+
+  .intro.abre .intro__linea {
+    opacity: 0;
+  }
+</style>

@@ -1,0 +1,336 @@
+---
+/**
+ * El gesto del sitio: la escena se abre desde la línea del agua de su foto,
+ * el título emerge apoyado sobre esa línea y su reflejo se forma debajo.
+ * La línea se calcula en CSS (unidades de contenedor) a partir de la proporción
+ * de la foto, su `horizonte` y su encuadre, así se mantiene con cualquier recorte.
+ */
+import { Picture } from 'astro:assets';
+import type { FotoTitulo } from '../data/fotos';
+
+interface Props {
+  foto: FotoTitulo;
+  texto: string;
+  nivel?: 'h1' | 'h2';
+  id?: string;
+  alto?: string;
+  portada?: boolean;
+  /** grupos de palabras que no se separan al cortar la línea, por ejemplo ['Vive una', 'experiencia', 'sobre el agua'] */
+  grupos?: string[];
+}
+
+const { foto, texto, nivel = 'h2', id, alto = '84svh', portada = false, grupos } = Astro.props;
+const Tag = nivel;
+const ratio = foto.src.height / foto.src.width;
+// cada grupo es una lista de palabras; entre grupos sí se puede cortar la línea
+let n = 0;
+const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: n++ })));
+---
+
+<div
+  class:list={['escena', { 'escena--portada': portada }]}
+  style={`--ratio:${ratio.toFixed(4)};--hz:${foto.horizonte};--px:${foto.foco * 100}%;--py:${(foto.focoY ?? 0.5).toFixed(3)};--alto:${alto}`}
+  data-escena
+  data-revelar={portada ? 'portada' : 'escena'}
+>
+  <div class="escena__capa" data-parallax={portada ? '0.3' : '0.07'}>
+  <div class="escena__foto">
+    <Picture
+      src={foto.src}
+      alt={foto.alt}
+      formats={['avif', 'webp']}
+      widths={[480, 768, 1080, 1440, 1920].filter((w) => w <= foto.src.width * 2)}
+      sizes="100vw"
+      loading={portada ? 'eager' : 'lazy'}
+      fetchpriority={portada ? 'high' : 'auto'}
+      decoding={portada ? 'sync' : 'async'}
+    />
+  </div>
+  <div class="escena__velo" aria-hidden="true"></div>
+  <div class="agua" data-agua>
+    <span class="agua__linea" aria-hidden="true"></span>
+    <div class="marco agua__marco">
+      <Tag id={id} class:list={['agua__titulo', { 'agua__titulo--portada': portada }]} aria-label={texto}>
+        {
+          bloques.map((b, k) => (
+            <>
+              <span class:list={['grupo', { 'grupo--fijo': grupos }]} aria-hidden="true">
+                {b.map(({ p, i }, j) => (
+                  <>
+                    <span class="pal">
+                      <span class="pal__in" style={`--i:${i}`}>
+                        {p}
+                      </span>
+                    </span>
+                    {j < b.length - 1 ? ' ' : ''}
+                  </>
+                ))}
+              </span>
+              {k < bloques.length - 1 ? ' ' : ''}
+            </>
+          ))
+        }
+      </Tag>
+      <div class="agua__reflejo" aria-hidden="true" data-reflejo>
+        <span class:list={['agua__titulo', { 'agua__titulo--portada': portada }]}>
+          {
+            bloques.map((b, k) => (
+              <>
+                <span class:list={['grupo', { 'grupo--fijo': grupos }]}>
+                  {b.map(({ p, i }, j) => (
+                    <>
+                      <span class="pal">
+                        <span class="pal__in" style={`--i:${i}`}>
+                          {p}
+                        </span>
+                      </span>
+                      {j < b.length - 1 ? ' ' : ''}
+                    </>
+                  ))}
+                </span>
+                {k < bloques.length - 1 ? ' ' : ''}
+              </>
+            ))
+          }
+        </span>
+      </div>
+    </div>
+  </div>
+  </div>
+  <slot />
+</div>
+
+<style>
+  .escena {
+    --hr: max(calc(100cqw * var(--ratio)), 100cqh);
+    /* altura de la línea del agua en pantalla */
+    --linea: calc((100cqh - var(--hr)) * var(--py) + var(--hz) * var(--hr));
+    position: relative;
+    height: var(--alto);
+    min-height: 520px;
+    max-height: 1100px;
+    container-type: size;
+    overflow: hidden;
+    color: var(--espuma);
+    background: var(--noche);
+  }
+
+  .escena--portada {
+    min-height: 600px;
+    max-height: none;
+  }
+
+  .escena__capa {
+    position: absolute;
+    inset: 0;
+  }
+
+  :global(html.movido) .escena__capa {
+    will-change: transform;
+  }
+
+  /* margen para el parallax: la foto se agranda desde su propia línea del agua,
+     así el horizonte no se mueve y el título sigue apoyado en él */
+  :global(html.movido) .escena__foto {
+    transform: scale(1.12);
+    transform-origin: 50% var(--linea);
+  }
+
+  .escena__foto {
+    position: absolute;
+    inset: 0;
+  }
+
+  .escena__foto :global(picture),
+  .escena__foto :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .escena__foto :global(img) {
+    object-fit: cover;
+    object-position: var(--px) calc(var(--py) * 100%);
+  }
+
+  .agua {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--linea);
+    height: 0;
+  }
+
+  .agua__marco {
+    position: relative;
+    height: 0;
+  }
+
+  /* la línea del agua como trazo: se dibuja antes de que la escena se abra */
+  .agua__linea {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -0.5px;
+    height: 1px;
+    background: var(--espuma);
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    pointer-events: none;
+  }
+
+  /* legibilidad: un velo local detrás del título, nunca sobre toda la foto */
+  .escena__velo {
+    position: absolute;
+    left: 0;
+    width: min(100%, 900px);
+    top: calc(var(--linea) - 50cqh);
+    height: 100cqh;
+    background: radial-gradient(60% 38% at 22% 50%, rgb(19 32 29 / 0.4), rgb(19 32 29 / 0));
+    pointer-events: none;
+  }
+
+  .agua__titulo {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: 0;
+    margin: 0;
+    max-width: 14ch;
+    font-family: var(--serif);
+    font-weight: 200;
+    font-size: var(--t-titulo);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    color: var(--espuma);
+    text-wrap: balance;
+    /* el renglón termina en la línea de base: el texto se apoya en el agua */
+    margin-bottom: calc(var(--baja, 0.234) * -1em);
+  }
+
+  .agua__titulo--portada {
+    --baja: 0.224;
+    max-width: 10em;
+    text-wrap: wrap;
+    font-size: min(var(--t-portada), calc((100vw - 2 * var(--gutter)) / 5.3));
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+
+  @supports (text-box: trim-end alphabetic) {
+    .agua__titulo {
+      text-box: trim-end alphabetic;
+      margin-bottom: 0;
+    }
+  }
+
+  /* cada palabra en su ventana: emerge desde abajo, con lugar para los descendentes */
+  .pal {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.26em;
+    margin-bottom: -0.26em;
+  }
+
+  .pal__in {
+    display: inline-block;
+  }
+
+  .grupo--fijo {
+    white-space: nowrap;
+  }
+
+  /* reflejo: mismo texto invertido, apenas visible y ondulado */
+  .agua__reflejo {
+    position: absolute;
+    inset: 0;
+    transform: translate3d(var(--desliz, 0px), 0, 0);
+  }
+
+  .agua__reflejo .agua__titulo {
+    transform: scaleY(-1);
+    transform-origin: 50% 100%;
+    opacity: 0.2;
+    filter: url(#onda);
+    -webkit-mask-image: linear-gradient(to top, #000 0, transparent 1.25em);
+    mask-image: linear-gradient(to top, #000 0, transparent 1.25em);
+    clip-path: inset(0 -4% 0 -4%);
+    user-select: none;
+  }
+
+  .escena--portada .agua__reflejo .agua__titulo {
+    filter: url(#onda-viva);
+  }
+
+  /* ---------- coreografía (solo con JS y sin reduced motion) ---------- */
+  :global(html.movido) .escena__foto {
+    clip-path: inset(var(--linea) 0 calc(100% - var(--linea)) 0);
+    transition: clip-path 1500ms cubic-bezier(0.76, 0, 0.18, 1) 380ms;
+  }
+
+  :global(html.movido) .escena__foto :global(img) {
+    transform: scale(1.22);
+    transition: transform 2600ms cubic-bezier(0.16, 1, 0.3, 1) 380ms;
+  }
+
+
+  :global(html.movido) .agua__marco > .agua__titulo .pal__in {
+    transform: translateY(105%);
+    transition: transform 1300ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(1000ms + var(--i) * 90ms);
+  }
+
+  :global(html.movido) .agua__reflejo .pal__in {
+    transform: translateY(105%);
+    opacity: 0;
+    transition:
+      transform 1500ms cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 1500ms ease;
+    transition-delay: calc(1250ms + var(--i) * 90ms);
+  }
+
+  :global(html.movido) .escena__velo {
+    opacity: 0;
+    transition: opacity 1400ms ease 900ms;
+  }
+
+  /* estado final */
+  :global(html.movido) .escena.visto .agua__linea {
+    animation: linea 2000ms cubic-bezier(0.65, 0, 0.35, 1) both;
+  }
+
+  @keyframes linea {
+    0% {
+      transform: scaleX(0);
+      opacity: 0.9;
+    }
+    40% {
+      transform: scaleX(1);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scaleX(1);
+      opacity: 0;
+    }
+  }
+
+  :global(html.movido) .escena.visto .escena__foto {
+    clip-path: inset(0 0 0 0);
+  }
+
+  :global(html.movido) .escena.visto .escena__foto :global(img) {
+    transform: scale(1);
+  }
+
+  :global(html.movido) .escena.visto .agua__marco > .agua__titulo .pal__in,
+  :global(html.movido) .escena.visto .agua__reflejo .agua__titulo .pal__in {
+    transform: none;
+    opacity: 1;
+  }
+
+  :global(html.movido) .escena.visto .escena__velo {
+    opacity: 1;
+  }
+</style>

@@ -1,0 +1,683 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import TituloAgua from '../TituloAgua.astro';
+import Icono from '../Icono.astro';
+import { titulos, galeria } from '../../data/fotos';
+
+const filtros = [
+  { id: 'todas', texto: 'Todas' },
+  { id: 'dia', texto: 'Día' },
+  { id: 'atardecer', texto: 'Atardecer' },
+  { id: 'noche', texto: 'Noche' },
+  { id: 'interior', texto: 'Interior' },
+];
+
+const fotos = await Promise.all(
+  galeria.map(async (f) => {
+    const grande = await getImage({ src: f.src, width: Math.min(1800, f.src.width), format: 'webp' });
+    return { ...f, grande: grande.src, ratio: f.src.width / f.src.height };
+  }),
+);
+---
+
+<section
+  id="galeria"
+  class="seccion galeria"
+  aria-labelledby="titulo-galeria"
+  data-momento="atardecer"
+  data-tono="oscuro"
+>
+  <TituloAgua foto={titulos.galeria} texto="Galería" id="titulo-galeria" alto="80svh" />
+
+  <div class="seccion__cuerpo galeria__cuerpo" data-galeria>
+    <div class="pista" data-pista>
+    <div class="pista__ventana">
+    <div class="marco galeria__barra">
+      <div class="filtros" role="group" aria-label="Filtrar fotos por momento del día">
+        {
+          filtros.map((f, i) => (
+            <button type="button" class="filtro" aria-pressed={i === 0 ? 'true' : 'false'} data-filtro={f.id}>
+              {f.texto}
+            </button>
+          ))
+        }
+      </div>
+      <div class="galeria__nav">
+        <button type="button" class="galeria__flecha" data-anterior aria-label="Fotos anteriores">
+          <Icono nombre="flecha" />
+        </button>
+        <button type="button" class="galeria__flecha galeria__flecha--der" data-siguiente aria-label="Fotos siguientes">
+          <Icono nombre="flecha" />
+        </button>
+      </div>
+    </div>
+
+    <p class="visually-hidden" aria-live="polite" data-conteo></p>
+
+    <ul role="list" class="tira" data-tira tabindex="-1">
+      {
+        fotos.map((f, i) => (
+          <li class="tira__item" data-momento={f.momento} style={`--r:${f.ratio.toFixed(3)}`}>
+            <button type="button" class="tira__boton" data-abrir={i} data-grande={f.grande} data-alt={f.alt}>
+              <span class="tira__marco">
+                <Picture
+                  src={f.src}
+                  alt={f.alt}
+                  formats={['avif', 'webp']}
+                  widths={[360, 560, 860]}
+                  sizes="(min-width: 900px) 40vw, 78vw"
+                />
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="marco pista__pie" aria-hidden="true">
+      <span class="pista__progreso"><span data-progreso></span></span>
+    </div>
+    </div>
+    </div>
+  </div>
+
+
+  <dialog class="visor" data-visor aria-label="Foto ampliada" data-tono="oscuro">
+    <figure class="visor__figura">
+      <img class="visor__foto" src={fotos[0].grande} alt={fotos[0].alt} data-visor-foto loading="lazy" decoding="async" />
+      <figcaption class="visor__pie">
+        <span data-visor-alt></span>
+        <span class="visor__pos" data-visor-pos></span>
+      </figcaption>
+    </figure>
+    <button type="button" class="visor__boton visor__cerrar" data-visor-cerrar aria-label="Cerrar">
+      <Icono nombre="cerrar" tam={28} />
+    </button>
+    <button type="button" class="visor__boton visor__ant" data-visor-ant aria-label="Foto anterior">
+      <Icono nombre="flecha" tam={28} />
+    </button>
+    <button type="button" class="visor__boton visor__sig" data-visor-sig aria-label="Foto siguiente">
+      <Icono nombre="flecha" tam={28} />
+    </button>
+  </dialog>
+</section>
+
+<style>
+  .galeria__barra {
+    /* fondo propio (el mismo Embalse de la sección) para que el contraste sea medible */
+    background: var(--embalse);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5);
+    margin-bottom: var(--s-6);
+  }
+
+  .filtros {
+    display: flex;
+    gap: var(--s-4);
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  @media (min-width: 600px) {
+    .filtros {
+      gap: var(--s-5);
+    }
+  }
+
+  .filtro {
+    position: relative;
+    flex: none;
+    min-height: 44px;
+    padding-inline: 2px;
+    font-size: 0.9375rem;
+    color: color-mix(in srgb, var(--bruma) 72%, transparent);
+    transition: color var(--d-corta) var(--ease-out);
+  }
+
+  .filtro::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    height: 1px;
+    background: var(--espuma);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--d-corta) var(--ease-out);
+  }
+
+  .filtro[aria-pressed='true'] {
+    color: var(--espuma);
+  }
+
+  .filtro[aria-pressed='true']::after {
+    transform: scaleX(1);
+  }
+
+  .galeria__nav {
+    display: none;
+    gap: var(--s-2);
+  }
+
+  .galeria__flecha {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--r-pill);
+    border: 1px solid color-mix(in srgb, var(--bruma) 35%, transparent);
+    color: var(--espuma);
+    transition:
+      transform var(--d-toque) var(--ease-out),
+      opacity var(--d-corta) var(--ease-out);
+  }
+
+  .galeria__flecha:active {
+    transform: scale(0.95);
+  }
+
+  .galeria__flecha:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .galeria__flecha--der :global(.icono) {
+    transform: scaleX(-1);
+  }
+
+  @media (min-width: 900px) {
+    .galeria__nav {
+      display: flex;
+    }
+  }
+
+  /* tira con scroll-snap */
+  .tira {
+    --alto: clamp(320px, 62vh, 620px);
+    display: flex;
+    gap: var(--s-4);
+    margin: 0;
+    padding: 0 var(--gutter);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tira::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tira__item {
+    flex: none;
+    scroll-snap-align: start;
+    height: min(var(--alto), calc(85vw / var(--r)));
+    aspect-ratio: var(--r);
+    max-width: 85vw;
+  }
+
+  .tira__item[hidden] {
+    display: none;
+  }
+
+  .tira__boton {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--r-foto);
+    overflow: hidden;
+    cursor: zoom-in;
+    transition: transform var(--d-toque) var(--ease-out);
+  }
+
+  .tira__boton:active {
+    transform: scale(0.985);
+  }
+
+  .tira__boton :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 899px) {
+    .tira__item {
+      height: auto;
+      width: 78vw;
+      max-width: none;
+      aspect-ratio: 4 / 5;
+    }
+  }
+
+  /* visor */
+  .visor {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgb(19 32 29 / 0.97);
+    color: var(--bruma);
+    overscroll-behavior: contain;
+  }
+
+  .visor::backdrop {
+    background: transparent;
+  }
+
+  .visor[open] {
+    display: grid;
+    place-items: center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .visor[open] {
+      animation: visor-entra var(--d-visor) var(--ease-out);
+    }
+    .visor[open] .visor__foto {
+      animation: foto-entra var(--d-visor) var(--ease-out);
+    }
+  }
+
+  @keyframes visor-entra {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes foto-entra {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+
+  .visor__figura {
+    display: grid;
+    gap: var(--s-4);
+    justify-items: start;
+    padding: 72px var(--gutter) calc(var(--s-7) + env(safe-area-inset-bottom));
+    max-width: 100%;
+    touch-action: pan-y;
+  }
+
+  .visor__foto {
+    max-width: calc(100vw - 2 * var(--gutter));
+    max-height: calc(100svh - 200px);
+    width: auto;
+    height: auto;
+    border-radius: var(--r-foto);
+    transition: opacity var(--d-corta) var(--ease-out);
+  }
+
+  .visor__pie {
+    display: flex;
+    gap: var(--s-5);
+    justify-content: space-between;
+    width: 100%;
+    font-size: var(--t-detalle);
+    max-width: 70ch;
+  }
+
+  .visor__pos {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in srgb, var(--bruma) 75%, transparent);
+  }
+
+  .visor__boton {
+    position: fixed;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    color: var(--espuma);
+    border-radius: var(--r-pill);
+    transition: transform var(--d-toque) var(--ease-out);
+  }
+
+  .visor__boton:active {
+    transform: scale(0.94);
+  }
+
+  .visor__cerrar {
+    top: calc(var(--s-3) + env(safe-area-inset-top));
+    right: calc(var(--gutter) - 10px);
+  }
+
+  .visor__ant,
+  .visor__sig {
+    top: 50%;
+    margin-top: -24px;
+  }
+
+  .visor__ant {
+    left: var(--s-2);
+  }
+
+  .visor__sig {
+    right: var(--s-2);
+  }
+
+  .visor__sig :global(.icono) {
+    transform: scaleX(-1);
+  }
+
+  @media (max-width: 899px) {
+    .visor__ant,
+    .visor__sig {
+      display: none;
+    }
+  }
+  /* ---------- pista: en desktop el scroll vertical mueve la tira ---------- */
+  .tira__marco {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .pista__pie {
+    margin-top: var(--s-6);
+  }
+
+  .pista__progreso {
+    display: none;
+    position: relative;
+    height: 1px;
+    background: color-mix(in srgb, var(--bruma) 22%, transparent);
+    overflow: hidden;
+  }
+
+  .pista__progreso span {
+    position: absolute;
+    inset: 0;
+    background: var(--espuma);
+    transform: scaleX(var(--p, 0));
+    transform-origin: 0 50%;
+  }
+
+  .pista.fija .pista__ventana {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .pista.fija .tira {
+    overflow: visible;
+    scroll-snap-type: none;
+    transform: translate3d(var(--x, 0px), 0, 0);
+    will-change: transform;
+  }
+
+  .pista.fija .tira__boton :global(img) {
+    transform: scale(1.14);
+  }
+
+  .pista.fija .galeria__nav {
+    display: none;
+  }
+
+  .pista.fija .pista__progreso {
+    display: block;
+  }
+
+  /* las fotos entran desde la derecha cuando la galería aparece */
+  :global(html.movido) .tira__item {
+    opacity: 0;
+    transform: translateX(80px);
+    transition:
+      opacity 1000ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1400ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--n, 0) * 80ms);
+  }
+
+  :global(html.movido) .pista.visto .tira__item {
+    opacity: 1;
+    transform: none;
+  }
+
+
+  /* la miniatura se transforma en la foto ampliada */
+  :global(::view-transition-group(foto-abierta)) {
+    animation-duration: 650ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  :global(::view-transition-old(foto-abierta)),
+  :global(::view-transition-new(foto-abierta)) {
+    animation: none;
+    mix-blend-mode: normal;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
+
+<script>
+  const raiz = document.querySelector<HTMLElement>('[data-galeria]')!;
+  const tira = raiz.querySelector<HTMLElement>('[data-tira]')!;
+  const items = [...tira.querySelectorAll<HTMLLIElement>('.tira__item')];
+  const filtros = [...raiz.querySelectorAll<HTMLButtonElement>('[data-filtro]')];
+  const conteo = raiz.querySelector<HTMLElement>('[data-conteo]')!;
+  const ant = raiz.querySelector<HTMLButtonElement>('[data-anterior]')!;
+  const sig = raiz.querySelector<HTMLButtonElement>('[data-siguiente]')!;
+
+  const nombres: Record<string, string> = {
+    todas: 'todas las fotos',
+    dia: 'fotos de día',
+    atardecer: 'fotos de atardecer',
+    noche: 'fotos de noche',
+    interior: 'fotos del interior',
+  };
+
+  function filtrar(id: string) {
+    filtros.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filtro === id)));
+    let n = 0;
+    items.forEach((li) => {
+      const ver = id === 'todas' || li.dataset.momento === id;
+      li.hidden = !ver;
+      if (ver) n++;
+    });
+    tira.scrollTo({ left: 0, behavior: 'instant' as ScrollBehavior });
+    conteo.textContent = `${n} ${nombres[id]}`;
+    flechas();
+  }
+  filtros.forEach((b) => b.addEventListener('click', () => filtrar(b.dataset.filtro!)));
+
+  const reducir = matchMedia('(prefers-reduced-motion: reduce)');
+  function mover(dir: 1 | -1) {
+    tira.scrollBy({ left: dir * tira.clientWidth * 0.8, behavior: reducir.matches ? 'instant' : 'smooth' });
+  }
+  ant.addEventListener('click', () => mover(-1));
+  sig.addEventListener('click', () => mover(1));
+  function flechas() {
+    ant.disabled = tira.scrollLeft <= 2;
+    sig.disabled = tira.scrollLeft + tira.clientWidth >= tira.scrollWidth - 2;
+  }
+  tira.addEventListener('scroll', flechas, { passive: true });
+  flechas();
+
+  // visor
+  const visor = document.querySelector<HTMLDialogElement>('[data-visor]')!;
+  const foto = visor.querySelector<HTMLImageElement>('[data-visor-foto]')!;
+  const alt = visor.querySelector<HTMLElement>('[data-visor-alt]')!;
+  const pos = visor.querySelector<HTMLElement>('[data-visor-pos]')!;
+  let lista: HTMLButtonElement[] = [];
+  let actual = 0;
+  let origen: HTMLButtonElement | null = null;
+
+  function mostrar(i: number) {
+    actual = (i + lista.length) % lista.length;
+    const b = lista[actual];
+    foto.src = b.dataset.grande!;
+    foto.alt = b.dataset.alt!;
+    alt.textContent = b.dataset.alt!;
+    pos.textContent = `${actual + 1} de ${lista.length}`;
+  }
+
+  tira.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-abrir]');
+    if (!b) return;
+    lista = items.filter((li) => !li.hidden).map((li) => li.querySelector('button')!);
+    origen = b;
+    const mini = b.querySelector('img')!;
+    const abrir = () => {
+      mostrar(lista.indexOf(b));
+      visor.showModal();
+      document.documentElement.style.overflow = 'hidden';
+    };
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { finished: Promise<void> };
+    };
+    if (doc.startViewTransition && document.documentElement.classList.contains('movido')) {
+      // la miniatura ya está cargada: se usa primero y después se cambia por la grande
+      mini.style.viewTransitionName = 'foto-abierta';
+      const vt = doc.startViewTransition(() => {
+        mini.style.viewTransitionName = '';
+        abrir();
+        foto.src = mini.currentSrc;
+        foto.style.viewTransitionName = 'foto-abierta';
+      });
+      vt.finished
+        .catch(() => {})
+        .finally(() => {
+          foto.style.viewTransitionName = '';
+          foto.src = b.dataset.grande!;
+        });
+    } else {
+      abrir();
+    }
+  });
+
+  visor.addEventListener('close', () => {
+    document.documentElement.style.overflow = '';
+    origen?.focus();
+  });
+  visor.querySelector('[data-visor-cerrar]')!.addEventListener('click', () => visor.close());
+  visor.querySelector('[data-visor-ant]')!.addEventListener('click', () => mostrar(actual - 1));
+  visor.querySelector('[data-visor-sig]')!.addEventListener('click', () => mostrar(actual + 1));
+  visor.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') mostrar(actual - 1);
+    if (e.key === 'ArrowRight') mostrar(actual + 1);
+  });
+  // tocar fuera de la foto cierra
+  visor.addEventListener('click', (e) => {
+    if (e.target === visor) visor.close();
+  });
+
+  // swipe horizontal en el visor
+  let x0: number | null = null;
+  let y0 = 0;
+  visor.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse') return;
+    x0 = e.clientX;
+    y0 = e.clientY;
+  });
+  visor.addEventListener('pointerup', (e) => {
+    if (x0 == null) return;
+    const dx = e.clientX - x0;
+    const dy = e.clientY - y0;
+    x0 = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) mostrar(actual + (dx < 0 ? 1 : -1));
+  });
+  // ---------- pista fija (desktop): el scroll vertical mueve la tira ----------
+  const pista = raiz.querySelector<HTMLElement>('[data-pista]')!;
+  const barraProgreso = raiz.querySelector<HTMLElement>('[data-progreso]')!;
+  const movido = document.documentElement.classList.contains('movido');
+  const ancho = matchMedia('(min-width: 900px)');
+  let recorrido = 0;
+
+  function numerar() {
+    let n = 0;
+    items.forEach((li) => {
+      if (!li.hidden) li.style.setProperty('--n', String(n++));
+    });
+  }
+
+  function moverPista() {
+    if (!pista.classList.contains('fija')) return;
+    const r = pista.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
+    tira.style.setProperty('--x', `${(-p * recorrido).toFixed(1)}px`);
+    barraProgreso.style.setProperty('--p', p.toFixed(4));
+    const centro = innerWidth / 2;
+    for (const li of items) {
+      if (li.hidden) continue;
+      const b = li.getBoundingClientRect();
+      if (b.right < -200 || b.left > innerWidth + 200) continue;
+      const d = (b.left + b.width / 2 - centro) / innerWidth;
+      // se mueve la foto misma, sin pasar por una variable del padre
+      li.querySelector<HTMLElement>('.tira__boton img')!.style.transform = `translate3d(${(-d * 60).toFixed(1)}px, 0, 0) scale(1.14)`;
+    }
+  }
+
+  function medirPista() {
+    const fija = movido && ancho.matches && !reducir.matches;
+    pista.classList.toggle('fija', fija);
+    if (!fija) {
+      pista.style.height = '';
+      tira.style.removeProperty('--x');
+      tira.querySelectorAll<HTMLElement>('.tira__boton img').forEach((i) => (i.style.transform = ''));
+      return;
+    }
+    const x = tira.style.getPropertyValue('--x');
+    tira.style.setProperty('--x', '0px');
+    recorrido = Math.max(0, tira.scrollWidth - innerWidth);
+    tira.style.setProperty('--x', x || '0px');
+    pista.style.height = `${innerHeight + recorrido * 0.8}px`;
+    moverPista();
+  }
+
+  addEventListener('scroll', moverPista, { passive: true });
+  addEventListener('resize', medirPista);
+  ancho.addEventListener('change', medirPista);
+  tira.addEventListener('load', medirPista, true);
+
+  // con teclado: si el foco cae en una foto fuera de pantalla, llevar el scroll hasta ella
+  tira.addEventListener('focusin', (e) => {
+    if (!pista.classList.contains('fija')) return;
+    const li = (e.target as HTMLElement).closest('li');
+    if (!li) return;
+    const objetivo = Math.min(recorrido, Math.max(0, li.offsetLeft - innerWidth * 0.3));
+    const top = pista.getBoundingClientRect().top + scrollY + objetivo;
+    scrollTo({ top, behavior: 'instant' as ScrollBehavior });
+  });
+
+  // aparición de las fotos
+  numerar();
+  if (movido) {
+    new IntersectionObserver(
+      ([x], obs) => {
+        if (x.isIntersecting) {
+          pista.classList.add('visto');
+          obs.disconnect();
+        }
+      },
+      { rootMargin: '0px 0px -20% 0px' },
+    ).observe(pista);
+  }
+
+  filtros.forEach((b) =>
+    b.addEventListener('click', () => {
+      numerar();
+      medirPista();
+      if (pista.classList.contains('fija')) {
+        const top = pista.getBoundingClientRect().top + scrollY;
+        if (scrollY > top) scrollTo({ top, behavior: 'instant' as ScrollBehavior });
+      }
+    }),
+  );
+  medirPista();
+
+</script>

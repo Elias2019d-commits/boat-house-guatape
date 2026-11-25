@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Cielo from '../components/Cielo.astro';
+import BotonReservar from '../components/BotonReservar.astro';
+import Portada from '../components/secciones/Portada.astro';
+import LaCasa from '../components/secciones/LaCasa.astro';
+import QueIncluye from '../components/secciones/QueIncluye.astro';
+import EnElAgua from '../components/secciones/EnElAgua.astro';
+import Galeria from '../components/secciones/Galeria.astro';
+import Resenas from '../components/secciones/Resenas.astro';
+import Reserva from '../components/secciones/Reserva.astro';
+import Preguntas from '../components/secciones/Preguntas.astro';
+import Contacto from '../components/secciones/Contacto.astro';
+---
+
+<Base
+  title="Boat House Guatapé, casa flotante con jacuzzi privado en el embalse"
+  description="Casa flotante para dos con jacuzzi privado en el embalse de Guatapé, Antioquia. Traslado en lancha, kayak, paddle board y desayuno. Elige tus fechas y reserva por WhatsApp."
+>
+  <Cielo />
+  <Nav />
+  <main id="contenido">
+    <Portada />
+    <LaCasa />
+    <QueIncluye />
+    <EnElAgua />
+    <Galeria />
+    <Resenas />
+    <Reserva />
+    <Preguntas />
+    <Contacto />
+  </main>
+  <BotonReservar />
+</Base>

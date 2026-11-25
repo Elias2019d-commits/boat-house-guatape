@@ -1,0 +1,94 @@
+---
+import resenas from '../../data/resenas.json';
+
+interface Resena {
+  texto: string;
+  autor: string;
+  fuente: string;
+  url?: string;
+}
+const lista = resenas as Resena[];
+---
+
+<section class="seccion resenas" aria-labelledby="titulo-resenas" data-momento="atardecer" data-tono="oscuro">
+  <div class="marco">
+    <h2 id="titulo-resenas" class="visually-hidden">Lo que cuentan los huéspedes</h2>
+    <ul role="list" class="resenas__lista">
+      {
+        lista.map((r) => (
+          <li>
+            <figure class="resena" data-revelar="texto">
+              <blockquote>
+                <p data-palabras>«{r.texto}»</p>
+              </blockquote>
+              <figcaption>
+                {r.url ? (
+                  <a href={r.url} rel="noopener" target="_blank">
+                    {r.autor}
+                  </a>
+                ) : (
+                  r.autor
+                )}
+                <span class="visually-hidden">, en {r.fuente}</span>
+              </figcaption>
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="resenas__ig" data-revelar="sube">
+      Somos 20,7 mil en Instagram.
+      <a href="https://www.instagram.com/boat_house_guatape/" rel="noopener" target="_blank">Síguenos en @boat_house_guatape</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .resenas__lista {
+    display: grid;
+    gap: var(--s-9);
+  }
+
+  .resena {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .resena blockquote {
+    margin: 0;
+  }
+
+  .resena p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--espuma);
+    max-width: 24ch;
+    text-wrap: pretty;
+  }
+
+  .resena figcaption {
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+  }
+
+  .resenas__ig {
+    margin-top: var(--s-9);
+    padding-top: var(--s-5);
+    border-top: 1px solid color-mix(in srgb, var(--bruma) 25%, transparent);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    max-width: 40rem;
+    font-size: 1rem;
+  }
+
+  @media (min-width: 900px) {
+    .resenas .marco {
+      padding-left: calc(var(--gutter) + (100% - 2 * var(--gutter)) / 12);
+    }
+  }
+</style>

@@ -1,0 +1,576 @@
+---
+import { Picture } from 'astro:assets';
+import '../../styles/calendario.css';
+import TituloAgua from '../TituloAgua.astro';
+import { titulos, planes as fotosPlanes } from '../../data/fotos';
+import precios from '../../data/precios.json';
+import { pesos } from '../../lib/precios';
+
+const ocasiones = ['aniversario', 'cumpleaños', 'pedida', 'solo porque sí'];
+---
+
+<section id="reserva" class="seccion reserva" aria-labelledby="titulo-reserva" data-momento="noche" data-tono="oscuro">
+  <TituloAgua foto={titulos.reserva} texto="Planes y reserva" id="titulo-reserva" alto="70svh" />
+
+  <div class="marco seccion__cuerpo">
+    <!-- planes y precios -->
+    <div class="planes">
+      <p class="planes__nota" data-revelar="sube">
+        Precios por pareja, por noche. La noche se cobra según el día en que empieza: de lunes a jueves es tarifa de
+        semana; viernes, sábado y domingo, de fin de semana.
+      </p>
+      <table class="planes__tabla">
+        <caption class="visually-hidden">Precios por pareja, por noche, en pesos colombianos</caption>
+        <thead>
+          <tr>
+            <th scope="col"><span class="visually-hidden">Plan</span></th>
+            <th scope="col">Semana</th>
+            <th scope="col">Fin de semana</th>
+          </tr>
+        </thead>
+        <tbody data-revelar="grupo">
+          {
+            precios.planes.map((p) => (
+              <tr id={`plan-${p.id}`}>
+                <th scope="row">
+                  <div class="plan">
+                    <Picture
+                      src={fotosPlanes[p.id].src}
+                      alt=""
+                      formats={['avif', 'webp']}
+                      widths={[96, 192]}
+                      sizes="96px"
+                      class="plan__foto"
+                    />
+                    <div>
+                      <span class="plan__nombre">{p.nombre}</span>
+                      <span class="plan__resumen">{p.resumen}</span>
+                      {'detalle' in p && p.detalle && <span class="plan__resumen">{p.detalle}</span>}
+                    </div>
+                  </div>
+                </th>
+                {p.semana == null ? (
+                  <td colspan="2" class="plan__precio plan__precio--pendiente">
+                    {/* TODO(clienta): precio del plan Sorpresa */}
+                    Precio por confirmar
+                  </td>
+                ) : (
+                  <>
+                    <td class="plan__precio" data-label="Semana">{pesos(p.semana)}</td>
+                    <td class="plan__precio" data-label="Fin de semana">{pesos(p.finde as number)}</td>
+                  </>
+                )}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- reserva en tres pasos -->
+    <div class="pasos" data-reserva data-revelar="grupo">
+      <noscript>
+        <p class="pasos__sinjs">
+          Para elegir fechas en el calendario hace falta JavaScript. También puedes escribirnos directo a
+          <a href="https://wa.me/573117197851">WhatsApp</a>.
+        </p>
+      </noscript>
+
+      <fieldset class="paso paso--fechas">
+        <legend class="paso__titulo">1. Elige tus fechas</legend>
+        <p class="paso__ayuda" id="ayuda-fechas" data-ayuda-fechas>Toca el día de llegada y después el de salida.</p>
+        <div class="calendario" data-calendario aria-describedby="ayuda-fechas"></div>
+        <ul role="list" class="leyenda" aria-hidden="true">
+          <li><span class="leyenda__muestra leyenda__muestra--estadia"></span>Tu estadía</li>
+          <li><span class="leyenda__muestra leyenda__muestra--ocupado">12</span>Ocupado</li>
+          <li><span class="leyenda__precio">700</span>Precio de la noche, en miles</li>
+        </ul>
+        <p class="aviso" role="status" data-aviso-fechas></p>
+      </fieldset>
+
+      <fieldset class="paso paso--plan">
+        <legend class="paso__titulo">2. Elige tu plan</legend>
+        <div class="opciones">
+          {
+            precios.planes.map((p, i) => (
+              <label class="opcion">
+                <input type="radio" name="plan" value={p.id} checked={i === 0} />
+                <span class="opcion__nombre">{p.nombre}</span>
+                <span class="opcion__resumen">{p.resumen}</span>
+              </label>
+            ))
+          }
+        </div>
+
+        <fieldset class="ocasion">
+          <legend class="ocasion__titulo">¿Celebran algo? <span class="opcional">Opcional</span></legend>
+          <div class="chips">
+            {
+              ocasiones.map((o) => (
+                <label class="chip">
+                  <input type="checkbox" name="ocasion" value={o} />
+                  <span>{o.charAt(0).toUpperCase() + o.slice(1)}</span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+      </fieldset>
+
+      <div class="paso paso--resumen" role="group" aria-labelledby="titulo-resumen">
+        <h3 id="titulo-resumen" class="paso__titulo">3. Envía por WhatsApp</h3>
+        <div class="resumen" aria-live="polite" data-resumen>
+          <p class="resumen__vacio">Cuando elijas tus fechas, aquí ves cada noche y el total estimado.</p>
+        </div>
+        <a data-iman class="boton boton--ocaso enviar" aria-disabled="true" data-enviar role="link" aria-describedby="falta">
+          Enviar solicitud por WhatsApp
+        </a>
+        <p class="falta" id="falta" data-falta>Elige la fecha de llegada.</p>
+        <p class="privacidad">La web no cobra ni guarda datos: la reserva se confirma por WhatsApp, como hoy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- planes ---------- */
+  .planes {
+    display: grid;
+    gap: var(--s-6);
+    margin-bottom: var(--s-10);
+  }
+
+  .planes__nota {
+    max-width: 52ch;
+    color: var(--bruma);
+  }
+
+  .planes__tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .planes__tabla thead th {
+    font-size: var(--t-detalle);
+    font-weight: 450;
+    text-align: right;
+    color: color-mix(in srgb, var(--bruma) 80%, transparent);
+    padding: 0 0 var(--s-3) var(--s-5);
+    white-space: nowrap;
+  }
+
+  .planes__tabla tbody tr {
+    border-top: 1px solid color-mix(in srgb, var(--agua) 40%, transparent);
+  }
+
+  .planes__tabla tbody tr:last-child {
+    border-bottom: 1px solid color-mix(in srgb, var(--agua) 40%, transparent);
+  }
+
+  .planes__tabla tbody th {
+    text-align: left;
+    font-weight: 400;
+    padding: var(--s-5) 0;
+  }
+
+  .plan {
+    display: flex;
+    gap: var(--s-4);
+    align-items: start;
+  }
+
+  .plan__foto,
+  .plan :global(img) {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: var(--r-foto);
+  }
+
+  .plan__nombre {
+    display: block;
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: var(--t-sub);
+    line-height: 1.2;
+    color: var(--espuma);
+  }
+
+  .plan__resumen {
+    display: block;
+    margin-top: var(--s-1);
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+    max-width: 44ch;
+  }
+
+  .plan__precio {
+    padding: var(--s-5) 0 var(--s-5) var(--s-5);
+    text-align: right;
+    vertical-align: top;
+    white-space: nowrap;
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.375rem;
+    line-height: 1.3;
+    color: var(--espuma);
+  }
+
+  .plan__precio--pendiente {
+    font-family: var(--sans);
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+  }
+
+  /* en celular la tabla se apila: plan arriba, precios debajo */
+  @media (max-width: 699px) {
+    .planes__tabla thead {
+      position: absolute;
+      clip: rect(0 0 0 0);
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    .planes__tabla,
+    .planes__tabla tbody,
+    .planes__tabla tr,
+    .planes__tabla th,
+    .planes__tabla td {
+      display: block;
+    }
+    .planes__tabla tbody tr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-bottom: var(--s-5);
+    }
+    .planes__tabla tbody th {
+      grid-column: 1 / -1;
+      padding-bottom: var(--s-4);
+    }
+    .plan__precio {
+      padding: 0;
+      text-align: left;
+    }
+    .plan__precio::before {
+      content: attr(data-label);
+      display: block;
+      font-family: var(--sans);
+      font-size: var(--t-detalle);
+      color: var(--bruma);
+    }
+    .plan__precio--pendiente {
+      grid-column: 1 / -1;
+    }
+    .plan__precio:not(.plan__precio--pendiente) {
+      padding-left: calc(64px + var(--s-4));
+    }
+    .plan__precio:not(.plan__precio--pendiente) + .plan__precio {
+      padding-left: 0;
+    }
+  }
+
+  /* ---------- pasos ---------- */
+  .pasos {
+    display: grid;
+    gap: var(--s-8);
+  }
+
+  .pasos__sinjs {
+    padding: var(--s-5);
+    border: 1px solid var(--ocaso);
+    border-radius: var(--r-foto);
+  }
+
+  .paso {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+  }
+
+  .paso__titulo {
+    padding: 0;
+    margin-bottom: var(--s-2);
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: var(--t-sub);
+    line-height: 1.25;
+    color: var(--espuma);
+  }
+
+  .paso__ayuda {
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+  }
+
+  .aviso {
+    min-height: 1.45em;
+    font-size: var(--t-detalle);
+    color: var(--ocaso);
+  }
+
+  .leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+  }
+
+  .leyenda li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .leyenda__muestra {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--r-campo);
+    font-size: 11px;
+  }
+
+  .leyenda__muestra--estadia {
+    background: var(--bruma);
+  }
+
+  .leyenda__muestra--ocupado {
+    text-decoration: line-through;
+    color: color-mix(in srgb, var(--bruma) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--agua) 50%, transparent);
+  }
+
+  .leyenda__precio {
+    font-size: 11px;
+    color: color-mix(in srgb, var(--bruma) 80%, transparent);
+  }
+
+  /* plan */
+  .opciones {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .opcion {
+    position: relative;
+    display: grid;
+    gap: var(--s-1);
+    padding: var(--s-4) var(--s-5);
+    border: 1px solid color-mix(in srgb, var(--agua) 55%, transparent);
+    border-radius: var(--r-foto);
+    cursor: pointer;
+    transition: border-color var(--d-corta) var(--ease-out);
+  }
+
+  .opcion input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .opcion:has(input:checked) {
+    border-color: var(--espuma);
+    box-shadow: inset 0 0 0 0.5px var(--espuma);
+  }
+
+  .opcion:has(input:focus-visible) {
+    outline: 2px solid var(--ocaso);
+    outline-offset: 3px;
+  }
+
+  .opcion__nombre {
+    font-weight: 550;
+    color: var(--espuma);
+  }
+
+  .opcion__resumen {
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+  }
+
+  .ocasion {
+    margin: var(--s-5) 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .ocasion__titulo {
+    padding: 0;
+    margin-bottom: var(--s-3);
+    font-weight: 550;
+    color: var(--espuma);
+  }
+
+  .opcional {
+    font-weight: 400;
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+    margin-left: var(--s-2);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .chip {
+    position: relative;
+  }
+
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .chip span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--s-5);
+    border-radius: var(--r-pill);
+    border: 1px solid color-mix(in srgb, var(--agua) 60%, transparent);
+    font-size: 0.9375rem;
+    color: var(--bruma);
+    transition:
+      transform var(--d-toque) var(--ease-out),
+      opacity var(--d-corta) var(--ease-out);
+  }
+
+  .chip input:checked + span {
+    background: var(--bruma);
+    border-color: var(--bruma);
+    color: var(--noche);
+  }
+
+  .chip input:active + span {
+    transform: scale(0.96);
+  }
+
+  .chip input:focus-visible + span {
+    outline: 2px solid var(--ocaso);
+    outline-offset: 3px;
+  }
+
+  /* resumen */
+  .resumen {
+    padding: var(--s-5);
+    background: var(--espuma);
+    color: var(--noche);
+    border-radius: var(--r-foto);
+    min-height: 160px;
+  }
+
+  .resumen__vacio {
+    font-size: var(--t-detalle);
+    color: var(--embalse);
+  }
+
+  .resumen :global(.resumen__rango) {
+    font-weight: 550;
+    color: var(--noche);
+  }
+
+  .resumen :global(table) {
+    width: 100%;
+    margin-block: var(--s-4);
+    border-collapse: collapse;
+    font-size: var(--t-detalle);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .resumen :global(td),
+  .resumen :global(th) {
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--agua) 30%, transparent);
+    text-align: left;
+    font-weight: 400;
+  }
+
+  .resumen :global(td) {
+    text-align: right;
+    color: var(--teca);
+  }
+
+  .resumen :global(.resumen__tarifa) {
+    color: var(--embalse);
+  }
+
+  .resumen :global(.resumen__total) {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--s-4);
+  }
+
+  .resumen :global(.resumen__total strong) {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.75rem;
+    color: var(--teca);
+    font-variant-numeric: lining-nums;
+  }
+
+  .resumen :global(.resumen__sujeto) {
+    margin-top: var(--s-2);
+    font-size: var(--t-detalle);
+    color: var(--teca);
+  }
+
+  .enviar {
+    min-height: 56px;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .falta {
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+    min-height: 1.45em;
+  }
+
+  .privacidad {
+    font-size: var(--t-detalle);
+    color: var(--bruma);
+    max-width: 44ch;
+  }
+
+  @media (min-width: 1100px) {
+    .pasos {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--s-7);
+      align-items: start;
+    }
+    .paso--resumen {
+      position: sticky;
+      top: 104px;
+    }
+  }
+
+  @media (min-width: 700px) and (max-width: 1099px) {
+    .pasos {
+      grid-template-columns: 1fr 1fr;
+    }
+    .paso--fechas {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
+
+<script>
+  import { iniciarReserva } from '../../scripts/reserva';
+  iniciarReserva(document.querySelector<HTMLElement>('[data-reserva]')!);
+</script>
