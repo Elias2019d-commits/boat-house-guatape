@@ -27,8 +27,10 @@ import { titulos } from '../../data/fotos';
 </section>
 
 <style>
+  /* la foto de portada es horizontal: en el celular la escena es más baja
+     para que se vea la casa entera y no solo la cabina */
   .portada {
-    --alto-portada: 80svh;
+    --alto-portada: max(440px, min(64svh, 128vw));
     position: relative;
   }
 

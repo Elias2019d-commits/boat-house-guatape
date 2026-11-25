@@ -10,7 +10,7 @@ const ocasiones = ['aniversario', 'cumpleaños', 'pedida', 'solo porque sí'];
 ---
 
 <section id="reserva" class="seccion reserva" aria-labelledby="titulo-reserva" data-momento="noche" data-tono="oscuro">
-  <TituloAgua foto={titulos.reserva} texto="Planes y reserva" id="titulo-reserva" alto="70svh" />
+  <TituloAgua foto={titulos.reserva} texto="Planes y reserva" id="titulo-reserva" alto="max(420px, min(70svh, 108vw))" />
 
   <div class="marco seccion__cuerpo">
     <!-- planes y precios -->
@@ -133,6 +133,11 @@ const ocasiones = ['aniversario', 'cumpleaños', 'pedida', 'solo porque sí'];
 </section>
 
 <style>
+  /* la foto es muy panorámica: en el celular la escena es más baja para que se vea la casa */
+  #reserva :global(.escena) {
+    min-height: 420px;
+  }
+
   /* ---------- planes ---------- */
   .planes {
     display: grid;

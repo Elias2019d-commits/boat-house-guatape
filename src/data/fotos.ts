@@ -14,6 +14,12 @@ import jacuzziAtardecer from '../assets/fotos/jacuzzi-atardecer.jpg';
 // TODO(clienta): original en alta de esta foto. La del kit (720 × 1280) se reescaló x2 con
 // superresolución (FSRCNN) mientras tanto.
 import casaAmanecer from '../assets/fotos/casa-amanecer.jpg';
+// fotos nuevas de la clienta (noviembre 2026)
+import portadaCasa from '../assets/fotos/portada-casa-atardecer.jpg';
+import casaNocheEstrellas from '../assets/fotos/casa-noche-estrellas.jpg';
+import jacuzziPanoramica from '../assets/fotos/jacuzzi-espuma-panoramica.jpg';
+import casaNocheLuces from '../assets/fotos/casa-noche-luces.jpg';
+import zonaBbq from '../assets/fotos/zona-bbq.jpg';
 import casaCanoaPenol from '../assets/fotos/casa-canoa-penol.jpg';
 import terrazaDia from '../assets/fotos/terraza-dia.jpg';
 import jetskiPaddlePenol from '../assets/fotos/jetski-paddle-penol.jpg';
@@ -53,16 +59,16 @@ export interface FotoTitulo {
 
 export const titulos = {
   portada: {
-    src: casaAmanecer,
-    alt: 'La casa flotante de vidrio y madera sobre el embalse quieto, con el cielo rosado del amanecer y una palma en la terraza.',
-    horizonte: 0.6,
-    foco: 0.7,
+    src: portadaCasa,
+    alt: 'La casa flotante de dos niveles sobre el agua quieta al atardecer, con la palma y el parasol en la terraza.',
+    horizonte: 0.575,
+    foco: 0.58,
   },
   casa: {
-    src: casaCanoaPenol,
-    alt: 'La casa flotante con su deck de madera y una canoa amarrada; al fondo, la Piedra del Peñol.',
-    horizonte: 0.4,
-    foco: 0.45,
+    src: casaNocheEstrellas,
+    alt: 'La casa flotante iluminada de noche bajo un cielo con estrellas, con las luces del pueblo reflejadas en el agua.',
+    horizonte: 0.553,
+    foco: 0.62,
   },
   incluye: {
     src: terrazaDia,
@@ -77,15 +83,15 @@ export const titulos = {
     foco: 0.6,
   },
   galeria: {
-    src: jacuzziPalma,
-    alt: 'Jacuzzi lleno de espuma junto al ventanal, con el cielo rosado del atardecer sobre el agua.',
-    horizonte: 0.485,
-    foco: 0.4,
+    src: jacuzziPanoramica,
+    alt: 'El jacuzzi lleno de espuma en la cubierta, frente al embalse al atardecer.',
+    horizonte: 0.437,
+    foco: 0.68,
   },
   reserva: {
-    src: terrazaNoche,
-    alt: 'La terraza de noche, con luces cálidas en la baranda y el embalse reflejando las nubes.',
-    horizonte: 0.505,
+    src: casaNocheLuces,
+    alt: 'La casa flotante al anochecer, con las luces encendidas adentro y el bosque detrás.',
+    horizonte: 0.625,
     foco: 0.5,
   },
 } satisfies Record<string, FotoTitulo>;
@@ -148,6 +154,8 @@ export const galeria: FotoGaleria[] = [
   { src: jetskiPaddlePenol, momento: 'dia', alt: 'Jet skis amarrados junto a la casa y el paddle board, con el Peñol a lo lejos.' },
   { src: aguaPaddle, momento: 'dia', alt: 'Una huésped de espaldas sobre el paddle board en el agua verde del embalse.' },
   { src: sorpresaGlobos, momento: 'interior', alt: 'La cama decorada para una sorpresa, con globos de corazón y vista al agua.' },
+  { src: casaAmanecer, momento: 'atardecer', alt: 'La casa flotante al amanecer, con la palma en la terraza y el cielo rosado sobre el embalse.' },
+  { src: jacuzziPalma, momento: 'atardecer', alt: 'Jacuzzi lleno de espuma junto al ventanal, con el cielo rosado del atardecer sobre el agua.' },
   { src: jacuzziAtardecer, momento: 'atardecer', alt: 'El jacuzzi encendido en la cubierta al atardecer, con el embalse quieto y la orilla en sombra.' },
 ];
 
@@ -162,7 +170,7 @@ export const incluyeFotos: Partial<Record<string, { src: ImageMetadata; alt: str
   kayak: { src: casaCanoa, alt: 'El kayak blanco amarrado al deck de la casa.', pos: '62% 70%' },
   paddle: { src: aguaPaddle, alt: 'Una huésped sobre el paddle board en el embalse.', pos: '50% 62%' },
   malla: { src: livingJacuzzi, alt: 'La malla catamarán tendida sobre el agua junto a la cubierta.', pos: '20% 62%' },
-  bbq: { src: casaCanoaPenol, alt: 'La terraza de arriba con la parrilla de la zona BBQ.', pos: '12% 42%' },
+  bbq: { src: zonaBbq, alt: 'La zona BBQ en la terraza, con la parrilla, una mesa y vista al embalse.', pos: '60% 60%' },
   cocina: { src: cocinaCama, alt: 'La cocina dotada, con estufa, lavaplatos y nevera.', pos: '62% 55%' },
   wifi: { src: interiorNoche, alt: 'La TV encendida de noche, vista desde la cama.', pos: '72% 40%' },
   cama: { src: camaPenol, alt: 'La cama queen frente a los ventanales y el Peñol.', pos: '50% 62%' },

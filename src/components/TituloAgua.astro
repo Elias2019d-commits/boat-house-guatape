@@ -120,8 +120,14 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
   }
 
   .escena--portada {
-    min-height: 600px;
+    min-height: 440px;
     max-height: none;
+  }
+
+  @media (min-width: 720px) {
+    .escena--portada {
+      min-height: 600px;
+    }
   }
 
   .escena__capa {
