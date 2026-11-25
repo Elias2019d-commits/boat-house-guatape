@@ -21,6 +21,7 @@ import jacuzziPanoramica from '../assets/fotos/jacuzzi-espuma-panoramica.jpg';
 import casaNocheLuces from '../assets/fotos/casa-noche-luces.jpg';
 import zonaBbq from '../assets/fotos/zona-bbq.jpg';
 import livingPenol from '../assets/fotos/living-penol.jpg';
+import bano from '../assets/fotos/bano.jpg';
 import casaCanoaPenol from '../assets/fotos/casa-canoa-penol.jpg';
 import terrazaDia from '../assets/fotos/terraza-dia.jpg';
 import jetskiPaddlePenol from '../assets/fotos/jetski-paddle-penol.jpg';
@@ -152,6 +153,7 @@ export const galeria: FotoGaleria[] = [
   { src: interiorNoche, momento: 'noche', alt: 'Noche de película desde la cama, con velas en la cubierta y las luces del pueblo al fondo.' },
   { src: terrazaDia, momento: 'dia', alt: 'La terraza de arriba con césped, parasol y una palma, frente al embalse.' },
   { src: lancha, momento: 'dia', alt: 'La lancha del traslado en el muelle, con la Piedra del Peñol al fondo.' },
+  { src: bano, momento: 'interior', alt: 'El baño con ducha, lavamanos de madera y ventanales altos con luz de la tarde.' },
   { src: jacuzziEspuma, momento: 'atardecer', alt: 'Espuma desbordando el jacuzzi mientras el cielo se pone naranja sobre la orilla.' },
   { src: camaCanoa, momento: 'interior', alt: 'La cama al sol con las puertas abiertas al embalse y la canoa justo afuera.' },
   { src: casaCanoaPenol, momento: 'dia', alt: 'La casa flotante con su deck y la canoa, frente a la Piedra del Peñol.' },

@@ -612,3 +612,16 @@ Después de ver la primera versión, se pidió un sitio más premium y con más 
 | Scroll | Suave con inercia (Lenis) solo con mouse o trackpad. | `movimiento.ts` |
 
 Portada: foto de la casa entera al amanecer (`casa-amanecer.jpg`, horizonte 0,60). TODO(clienta): original en alta resolución, la del kit es de 720 × 1280.
+
+
+### Fondos verdes (cambio del 2026-11-25)
+
+Ningún fondo blanco. Los fondos claros pasan a verde, de la misma familia de la paleta:
+
+| Token | HEX | Uso | Contraste |
+|---|---|---|---|
+| `--fondo-manana` | `#D8E5DA` | secciones de mañana, barra clara | Noche 12,9:1 · Embalse 8,1:1 |
+| `--fondo-dia` | `#C7DACB` | secciones de día (Qué incluye, En el agua) | Noche 11,4:1 · Embalse 7,1:1 |
+| `--tarjeta` | `#E4EEE5` | tarjetas claras (mini-bar, resumen de reserva) | Teca 4,8:1 · Noche 14,1:1 |
+
+Bruma y Espuma se mantienen como color de texto sobre fondos oscuros.

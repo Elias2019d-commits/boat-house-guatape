@@ -11,7 +11,7 @@ html {
   /* bloquear el scroll (menú, visor) no cambia el ancho de la página */
   scrollbar-gutter: stable;
   color-scheme: light;
-  background: var(--bruma);
+  background: var(--fondo-manana);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -246,8 +246,8 @@ button {
 }
 
 /* Sin JS el fondo lo pinta cada sección. Con JS lo pinta el cielo (capas fijas). */
-.seccion[data-momento='manana'] { background: var(--bruma); }
-.seccion[data-momento='dia'] { background: var(--velo); }
+.seccion[data-momento='manana'] { background: var(--fondo-manana); }
+.seccion[data-momento='dia'] { background: var(--fondo-dia); }
 .seccion[data-momento='atardecer'] { background: var(--embalse); }
 .seccion[data-momento='noche'] { background: var(--noche); }
 html.cielo-activo .seccion { background: transparent; }

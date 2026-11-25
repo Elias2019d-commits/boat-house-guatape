@@ -4,6 +4,10 @@
   --bruma: #e5e8e2;
   --espuma: #f6f7f3;
   --velo: #d3dcd6;
+  /* fondos claros en verde: ningún fondo blanco (pedido del 2026-11-25) */
+  --fondo-manana: #d8e5da; /* mañana: verde salvia claro. Noche 12,9:1 · Embalse 8,1:1 */
+  --fondo-dia: #c7dacb;    /* día: un poco más verde. Noche 11,4:1 · Embalse 7,1:1 */
+  --tarjeta: #e4eee5;      /* tarjetas claras. Teca 4,8:1 · Noche 14,1:1 */
   --embalse: #2f4437;
   --agua: #6b827d;
   --noche: #13201d;
