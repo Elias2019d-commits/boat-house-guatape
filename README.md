@@ -88,7 +88,7 @@ Cuando haya dominio (por ejemplo `boathouseguatape.com`):
 
 Están marcados con `TODO(clienta)` en el código:
 
-- Fotos originales de la portada (casa al amanecer), el paddle, los jet ski y el jacuzzi de noche; fotos de la lancha, el desayuno y el parlante.
+- Fotos originales en alta de la portada (casa al amanecer) y de la lancha: hoy están reescaladas con superresolución desde una versión chica. También las del paddle, los jet ski y el jacuzzi de noche, y una foto del parlante.
 - Logo en vector (hoy es una versión provisoria en `public/logo.svg`).
 - Precio del plan Sorpresa frente al agua.
 - Regla de festivos (por defecto, la noche anterior a un festivo cobra fin de semana).
