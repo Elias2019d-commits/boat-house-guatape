@@ -5,7 +5,7 @@
  * Las animaciones solo corren mientras la escena está a la vista (clase .arriba en el visor).
  */
 interface Props {
-  clave: 'lancha' | 'desayuno' | 'parlante';
+  clave: 'parlante';
 }
 const { clave } = Astro.props;
 const id = `escena-${clave}`;
@@ -23,55 +23,6 @@ const id = `escena-${clave}`;
   </defs>
 
   <line class="e-horizonte" x1="0" y1="250" x2="800" y2="250"></line>
-
-  {
-    clave === 'lancha' && (
-      <>
-        <path class="e-fondo" d="M0 250 C120 206 220 214 300 232 S 460 202 560 226 S 720 238 800 222" />
-        <g id={`${id}-dibujo`}>
-          {/* la casa, a lo lejos: el destino */}
-          <path class="e-casa" d="M600 250 V214 H664 V250 M592 214 H672 M608 214 V198 H652 V214 M624 198 V186 M624 186 L640 180" />
-          <g class="e-bote">
-            <path d="M0 250 L100 250 L116 233 L74 233 L66 218 L32 218 L27 233 L6 233 Z" />
-            <path d="M38 226 H58" />
-            <path class="e-estela" d="M-8 255 Q-44 260 -86 255" />
-            <path class="e-estela e-estela--2" d="M-12 263 Q-62 270 -122 263" />
-          </g>
-        </g>
-        <g class="e-reflejo" mask={`url(#${id}-reflejo)`}>
-          <use href={`#${id}-dibujo`} transform="translate(0 500) scale(1 -1)" />
-        </g>
-        <path class="e-onda" d="M120 284 H164" />
-        <path class="e-onda e-onda--2" d="M520 300 H580" />
-        <path class="e-onda e-onda--3" d="M300 322 H336" />
-      </>
-    )
-  }
-
-  {
-    clave === 'desayuno' && (
-      <>
-        <g id={`${id}-dibujo`}>
-          {/* pan */}
-          <path d="M226 250 C226 222 246 212 276 212 S 326 222 326 250 Z" />
-          <path class="e-detalle" d="M252 228 L262 220 M272 230 L284 220 M294 232 L304 224" />
-          {/* taza y plato */}
-          <path d="M370 196 H470 V224 C470 240 454 250 436 250 H404 C386 250 370 240 370 224 Z" />
-          <path d="M470 206 C496 206 496 238 470 238" />
-          <path d="M346 250 H494" />
-        </g>
-        <g class="e-reflejo" mask={`url(#${id}-reflejo)`}>
-          <use href={`#${id}-dibujo`} transform="translate(0 500) scale(1 -1)" />
-        </g>
-        {/* vapor que sube */}
-        <path class="e-vapor" pathLength="1" d="M402 182 C392 168 412 158 402 144 S 412 120 402 106" />
-        <path class="e-vapor e-vapor--2" pathLength="1" d="M422 186 C412 172 432 162 422 148 S 432 124 422 110" />
-        <path class="e-vapor e-vapor--3" pathLength="1" d="M442 182 C432 168 452 158 442 144 S 452 120 442 106" />
-        <path class="e-onda" d="M180 290 H220" />
-        <path class="e-onda e-onda--2" d="M560 306 H612" />
-      </>
-    )
-  }
 
   {
     clave === 'parlante' && (
@@ -122,15 +73,6 @@ const id = `escena-${clave}`;
     stroke-opacity: 0.55;
   }
 
-  .e-fondo,
-  .e-detalle {
-    stroke-opacity: 0.4;
-  }
-
-  .e-casa {
-    stroke-opacity: 0.7;
-  }
-
   .e-reflejo {
     opacity: 0.35;
   }
@@ -146,45 +88,6 @@ const id = `escena-${clave}`;
 
   :global(.arriba) > .escena-svg :global(*) {
     animation-play-state: running;
-  }
-
-  .e-bote {
-    animation: navega 9s cubic-bezier(0.45, 0, 0.25, 1) infinite;
-  }
-
-  @keyframes navega {
-    0% {
-      transform: translateX(-150px);
-      opacity: 0;
-    }
-    8% {
-      opacity: 1;
-    }
-    78% {
-      transform: translateX(450px);
-      opacity: 1;
-    }
-    90%,
-    100% {
-      transform: translateX(462px);
-      opacity: 0;
-    }
-  }
-
-  .e-estela {
-    stroke-opacity: 0.5;
-    stroke-dasharray: 10 14;
-    animation: estela 1.2s linear infinite;
-  }
-
-  .e-estela--2 {
-    animation-duration: 1.6s;
-  }
-
-  @keyframes estela {
-    to {
-      stroke-dashoffset: 24;
-    }
   }
 
   .e-onda {
@@ -205,36 +108,6 @@ const id = `escena-${clave}`;
     }
     to {
       transform: translateX(14px);
-    }
-  }
-
-  .e-vapor {
-    stroke-opacity: 0.8;
-    stroke-dasharray: 0.5 1;
-    animation: vapor 3s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  }
-
-  .e-vapor--2 {
-    animation-delay: 0.7s;
-  }
-
-  .e-vapor--3 {
-    animation-delay: 1.4s;
-  }
-
-  @keyframes vapor {
-    0% {
-      stroke-dashoffset: 0.5;
-      transform: translateY(10px);
-      opacity: 0;
-    }
-    30% {
-      opacity: 1;
-    }
-    100% {
-      stroke-dashoffset: -1;
-      transform: translateY(-18px);
-      opacity: 0;
     }
   }
 
@@ -295,13 +168,6 @@ const id = `escena-${clave}`;
     }
     .e-sonido {
       opacity: 0.7;
-    }
-    .e-vapor {
-      stroke-dasharray: none;
-      opacity: 0.8;
-    }
-    .e-bote {
-      transform: translateX(300px);
     }
   }
 </style>

@@ -11,7 +11,8 @@
 import type { ImageMetadata } from 'astro';
 
 import jacuzziAtardecer from '../assets/fotos/jacuzzi-atardecer.jpg';
-// TODO(clienta): original en alta de esta foto (la del kit es de 720 × 1280)
+// TODO(clienta): original en alta de esta foto. La del kit (720 × 1280) se reescaló x2 con
+// superresolución (FSRCNN) mientras tanto.
 import casaAmanecer from '../assets/fotos/casa-amanecer.jpg';
 import casaCanoaPenol from '../assets/fotos/casa-canoa-penol.jpg';
 import terrazaDia from '../assets/fotos/terraza-dia.jpg';
@@ -33,6 +34,8 @@ import ventanalAtardecer from '../assets/fotos/ventanal-atardecer.jpg';
 import atardecerVentana from '../assets/fotos/atardecer-ventana.jpg';
 // provisorias del kit que siguen en uso (sin original de la clienta todavía)
 import aguaPaddle from '../assets/fotos/agua-paddle.jpg';
+// TODO(clienta): original de la lancha (esta sale de una captura de Instagram, reescalada x2)
+import lancha from '../assets/fotos/lancha.jpg';
 import aguaJetski from '../assets/fotos/agua-jetski.jpg';
 import gJacuzziNoche from '../assets/fotos/galeria-jacuzzi-noche.jpg';
 
@@ -142,12 +145,13 @@ export const galeria: FotoGaleria[] = [
 
 /**
  * Qué incluye: la foto que acompaña a cada ítem mientras la lista se recorre.
- * Solo fotos que muestran de verdad ese ítem. Los que no tienen foto (lancha, desayuno,
- * parlante) se muestran con una escena animada en línea fina (EscenaIncluye.astro).
+ * Solo fotos que muestran de verdad ese ítem. El que no tiene foto (parlante) se muestra
+ * con una escena animada en línea fina (EscenaIncluye.astro).
  * `pos` es el encuadre (object-position) para que el objeto quede a la vista.
  */
 export const incluyeFotos: Partial<Record<string, { src: ImageMetadata; alt: string; pos?: string }>> = {
-  jacuzzi: { src: jacuzziDia, alt: 'El jacuzzi privado en la cubierta, frente al embalse.', pos: '40% 60%' },
+  lancha: { src: lancha, alt: 'La lancha del traslado amarrada al muelle, con la Piedra del Peñol al fondo.', pos: '50% 60%' },
+  jacuzzi: { src: jacuzziAtardecer, alt: 'El jacuzzi privado encendido en la cubierta, frente al atardecer.', pos: '50% 62%' },
   kayak: { src: casaCanoa, alt: 'El kayak blanco amarrado al deck de la casa.', pos: '62% 70%' },
   paddle: { src: aguaPaddle, alt: 'Una huésped sobre el paddle board en el embalse.', pos: '50% 62%' },
   malla: { src: livingJacuzzi, alt: 'La malla catamarán tendida sobre el agua junto a la cubierta.', pos: '20% 62%' },

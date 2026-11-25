@@ -8,7 +8,6 @@ import { titulos, incluyeFotos } from '../../data/fotos';
 const incluye = [
   { icono: 'lancha', texto: 'Traslado en lancha' },
   { icono: 'jacuzzi', texto: 'Jacuzzi privado' },
-  { icono: 'desayuno', texto: 'Ingredientes para el desayuno' },
   { icono: 'kayak', texto: 'Kayak' },
   { icono: 'paddle', texto: 'Paddle board' },
   { icono: 'malla', texto: 'Malla catamarán' },
@@ -64,7 +63,7 @@ const incluye = [
                     loading="lazy"
                   />
                 ) : (
-                  <EscenaIncluye clave={i.icono as 'lancha' | 'desayuno' | 'parlante'} />
+                  <EscenaIncluye clave={i.icono as 'parlante'} />
                 )}
               </div>
             );

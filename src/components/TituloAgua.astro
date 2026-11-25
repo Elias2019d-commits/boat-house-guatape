@@ -39,7 +39,7 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
       src={foto.src}
       alt={foto.alt}
       formats={['avif', 'webp']}
-      widths={[480, 768, 1080, 1440, 1920].filter((w) => w <= foto.src.width * 2)}
+      widths={[480, 768, 1080, 1440, 1920].filter((w) => w <= foto.src.width)}
       sizes="100vw"
       loading={portada ? 'eager' : 'lazy'}
       fetchpriority={portada ? 'high' : 'auto'}
