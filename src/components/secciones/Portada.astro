@@ -3,43 +3,44 @@ import TituloAgua from '../TituloAgua.astro';
 import { titulos } from '../../data/fotos';
 ---
 
-<section id="inicio" class="portada" aria-labelledby="titulo-portada" data-momento="manana">
+<section id="inicio" class="portada" aria-labelledby="titulo-portada" data-momento="manana" data-portada>
   <TituloAgua
     foto={titulos.portada}
     texto="Vive una experiencia sobre el agua"
     nivel="h1"
     id="titulo-portada"
-    alto="100svh"
+    alto="var(--alto-portada)"
     portada
     grupos={['Vive una', 'experiencia', 'sobre el agua']}
-  >
-    <div class="portada__pie">
-      <div class="marco portada__fila">
-        <p class="portada__bajada">
-          Casa flotante con jacuzzi privado en el embalse de Guatapé, pensada para dos. Te llevamos en lancha.
-        </p>
-        <a href="#reserva" class="boton boton--ocaso portada__boton" data-iman>Ver fechas disponibles</a>
-      </div>
-      <span class="portada__bajar" aria-hidden="true"></span>
+  />
+  <!-- en el celular la bajada y el botón van debajo de la foto, para no taparla;
+       desde 720 px se apoyan sobre el agua, al pie de la foto -->
+  <div class="portada__pie">
+    <div class="marco portada__fila">
+      <p class="portada__bajada">
+        Casa flotante con jacuzzi privado en el embalse de Guatapé, pensada para dos. Te llevamos en lancha.
+      </p>
+      <a href="#reserva" class="boton portada__boton" data-iman>Ver fechas disponibles</a>
     </div>
-  </TituloAgua>
+    <span class="portada__bajar" aria-hidden="true"></span>
+  </div>
 </section>
 
 <style>
-  .portada__pie {
-    position: absolute;
-    inset: auto 0 0;
-    padding-bottom: calc(var(--s-7) + env(safe-area-inset-bottom));
-    color: var(--espuma);
+  .portada {
+    --alto-portada: 80svh;
+    position: relative;
   }
 
-  /* legibilidad local del pie, sin teñir la foto */
-  .portada__pie::before {
-    content: '';
-    position: absolute;
-    inset: -40% 0 0;
-    background: linear-gradient(to top, rgb(19 32 29 / 0.55), rgb(19 32 29 / 0));
-    pointer-events: none;
+  /* en el celular el título es más chico para que la casa se vea */
+  .portada :global(.agua__titulo--portada) {
+    font-size: min(2.75rem, calc((100vw - 2 * var(--gutter)) / 6.2));
+  }
+
+  .portada__pie {
+    position: relative;
+    padding: var(--s-6) 0 var(--s-7);
+    color: var(--noche);
   }
 
   .portada__fila {
@@ -60,11 +61,40 @@ import { titulos } from '../../data/fotos';
   }
 
   @media (min-width: 720px) {
+    .portada {
+      --alto-portada: 100svh;
+    }
+
+    .portada :global(.agua__titulo--portada) {
+      font-size: min(var(--t-portada), calc((100vw - 2 * var(--gutter)) / 5.3));
+    }
+
+    .portada__pie {
+      position: absolute;
+      inset: auto 0 0;
+      padding: 0 0 calc(var(--s-7) + env(safe-area-inset-bottom));
+      color: var(--espuma);
+    }
+
+    /* legibilidad local del pie, sin teñir la foto */
+    .portada__pie::before {
+      content: '';
+      position: absolute;
+      inset: -40% 0 0;
+      background: linear-gradient(to top, rgb(19 32 29 / 0.5), rgb(19 32 29 / 0));
+      pointer-events: none;
+    }
+
     .portada__fila {
       grid-template-columns: 1fr auto;
       align-items: end;
     }
+
+    /* sobre la foto oscura, el botón de reservar va en Ocaso */
     .portada__boton {
+      --fondo: var(--ocaso);
+      --tinta: var(--noche);
+      --relleno: var(--espuma);
       width: auto;
     }
   }
@@ -85,8 +115,12 @@ import { titulos } from '../../data/fotos';
     transition-delay: 1850ms;
   }
 
-  :global(html.movido .escena.visto) .portada__fila > * {
+  :global(html.movido) .portada.visto .portada__fila > * {
     opacity: 1;
+    transform: none;
+  }
+
+  :global(html.suave) .portada__fila > * {
     transform: none;
   }
 
@@ -127,9 +161,7 @@ import { titulos } from '../../data/fotos';
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .portada__bajar::after {
-      animation: none;
-    }
+  :global(html.suave) .portada__bajar::after {
+    animation: none;
   }
 </style>

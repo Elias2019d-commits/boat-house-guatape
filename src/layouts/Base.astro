@@ -102,9 +102,12 @@ const fuentes = `
     <script is:inline>
       (function () {
         var d = document.documentElement;
-        d.classList.add('js');
-        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        d.classList.add('movido');
+        d.classList.add('js', 'movido');
+        // con "reducir movimiento" el sitio se anima solo con fundidos, sin intro
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          d.classList.add('suave');
+          return;
+        }
         try {
           if (!sessionStorage.getItem('bh-intro')) d.classList.add('con-intro');
         } catch (e) {}

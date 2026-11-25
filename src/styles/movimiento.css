@@ -195,3 +195,82 @@ html.movido .escena--portada .escena__foto picture {
     transform: translateY(2px);
   }
 }
+
+
+/* ---------- modo suave (reducir movimiento): solo fundidos ---------- */
+html.suave [data-revelar='sube'],
+html.suave [data-revelar='grupo'] > *,
+html.suave [data-palabras] .palabra {
+  transform: none !important;
+  filter: none !important;
+}
+
+html.suave [data-revelar='foto'] {
+  clip-path: none;
+  opacity: 0;
+  transition: opacity 1000ms ease;
+}
+
+html.suave [data-revelar='foto'].visto {
+  opacity: 1;
+}
+
+html.suave [data-revelar='foto'] img,
+html.suave [data-revelar='linea'] {
+  transform: none !important;
+}
+
+html.suave .escena__foto {
+  clip-path: none !important;
+  transform: none !important;
+  opacity: 0;
+  transition: opacity 1200ms ease !important;
+}
+
+html.suave .escena.visto .escena__foto {
+  opacity: 1;
+}
+
+html.suave .escena__foto img,
+html.suave .escena__foto picture {
+  transform: none !important;
+  animation: none !important;
+}
+
+html.suave .pal__in {
+  transform: none !important;
+  opacity: 0;
+  transition: opacity 1000ms ease 600ms !important;
+}
+
+html.suave .escena.visto .pal__in,
+html.suave .despedida.visto .pal__in {
+  opacity: 1;
+}
+
+html.suave .agua__linea {
+  animation: none !important;
+}
+
+html.suave .tira__item {
+  transform: none !important;
+}
+
+html.suave .despedida__linea,
+html.suave .despedida__accion {
+  transform: none !important;
+}
+
+html.suave .visor-incluye__foto.arriba.entra {
+  animation: fundido 700ms ease both !important;
+}
+
+html.suave .visor-incluye__foto.arriba.entra img {
+  animation: none !important;
+}
+
+@keyframes fundido {
+  from {
+    opacity: 0;
+  }
+}

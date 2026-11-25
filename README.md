@@ -63,8 +63,9 @@ Las fotos están en [`src/assets/fotos/`](src/assets/fotos/) y se declaran en [`
 2. En `fotos.ts`, apunta el `import` correspondiente al archivo nuevo y actualiza su texto alternativo (`alt`): una frase que describa lo que se ve.
 3. Si es una foto con título (`titulos` en `fotos.ts`), ajusta:
    - `horizonte`: la altura de la línea del agua, donde el agua toca la orilla o las montañas, de `0` (arriba) a `1` (abajo). Ejemplo: en una foto de 2000 px de alto con el agua a 1200 px, `horizonte: 0.6`. El título se apoya justo sobre esa línea.
-   - `foco` y `focoY`: el punto que se conserva cuando la pantalla recorta la foto (de `0` a `1`, horizontal y vertical).
-4. Para "Qué incluye", `incluyeFotos` asigna una foto a cada ítem. Usa solo fotos que muestren ese ítem de verdad; si un ítem no tiene foto, sácalo de `incluyeFotos` y se muestra una escena animada.
+   - `foco`: el punto horizontal que se conserva cuando la pantalla recorta los lados (de `0` a `1`).
+   - `meta` (opcional): a qué altura de la pantalla querés ver la línea del agua (de `0` a `1`; por defecto `0.58`). La foto se desplaza sola para que el título quede ahí en cualquier pantalla.
+4. Para "Qué incluye", `incluyeFotos` asigna una foto a cada ítem. Usa solo fotos que muestren ese ítem de verdad.
 
 Revisa el resultado con `npm run dev` en celular y computadora.
 
@@ -88,7 +89,7 @@ Cuando haya dominio (por ejemplo `boathouseguatape.com`):
 
 Están marcados con `TODO(clienta)` en el código:
 
-- Fotos originales en alta de la portada (casa al amanecer) y de la lancha: hoy están reescaladas con superresolución desde una versión chica. También las del paddle, los jet ski y el jacuzzi de noche, y una foto del parlante.
+- Fotos originales en alta de la portada (casa al amanecer), la lancha, los jet ski y el jacuzzi de noche de Instagram: hoy están reescaladas con IA (Real-ESRGAN) desde versiones chicas. También las del paddle.
 - Logo en vector (hoy es una versión provisoria en `public/logo.svg`).
 - Precio del plan Sorpresa frente al agua.
 - Regla de festivos (por defecto, la noche anterior a un festivo cobra fin de semana).

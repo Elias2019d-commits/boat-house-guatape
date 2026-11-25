@@ -29,7 +29,7 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
 
 <div
   class:list={['escena', { 'escena--portada': portada }]}
-  style={`--ratio:${ratio.toFixed(4)};--hz:${foto.horizonte};--px:${foto.foco * 100}%;--py:${(foto.focoY ?? 0.5).toFixed(3)};--alto:${alto}`}
+  style={`--ratio:${ratio.toFixed(4)};--hz:${foto.horizonte};--fx:${foto.foco};--meta:${foto.meta ?? (portada ? 0.6 : 0.58)};--alto:${alto}`}
   data-escena
   data-revelar={portada ? 'portada' : 'escena'}
 >
@@ -102,9 +102,13 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
 
 <style>
   .escena {
+    /* la foto cubre la escena: alto y ancho con los que se dibuja */
     --hr: max(calc(100cqw * var(--ratio)), 100cqh);
-    /* altura de la línea del agua en pantalla */
-    --linea: calc((100cqh - var(--hr)) * var(--py) + var(--hz) * var(--hr));
+    --wr: calc(var(--hr) / var(--ratio));
+    /* la foto se desplaza para que su línea del agua quede a la altura --meta de la
+       escena (sin dejar huecos): así el título nunca cae fuera, sea cual sea la pantalla */
+    --top: clamp(calc(100cqh - var(--hr)), calc(var(--meta) * 100cqh - var(--hz) * var(--hr)), 0px);
+    --linea: calc(var(--top) + var(--hz) * var(--hr));
     position: relative;
     height: var(--alto);
     min-height: 520px;
@@ -141,16 +145,19 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
     inset: 0;
   }
 
-  .escena__foto :global(picture),
-  .escena__foto :global(img) {
+  .escena__foto :global(picture) {
     display: block;
     width: 100%;
     height: 100%;
   }
 
   .escena__foto :global(img) {
-    object-fit: cover;
-    object-position: var(--px) calc(var(--py) * 100%);
+    position: absolute;
+    max-width: none;
+    top: var(--top);
+    left: calc((100cqw - var(--wr)) * var(--fx));
+    width: var(--wr);
+    height: var(--hr);
   }
 
   .agua {
@@ -277,13 +284,13 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
 
 
   :global(html.movido) .agua__marco > .agua__titulo .pal__in {
-    transform: translateY(105%);
+    transform: translateY(135%);
     transition: transform 1300ms cubic-bezier(0.16, 1, 0.3, 1);
     transition-delay: calc(1000ms + var(--i) * 90ms);
   }
 
   :global(html.movido) .agua__reflejo .pal__in {
-    transform: translateY(105%);
+    transform: translateY(135%);
     opacity: 0;
     transition:
       transform 1500ms cubic-bezier(0.16, 1, 0.3, 1),

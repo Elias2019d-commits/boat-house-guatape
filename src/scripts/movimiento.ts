@@ -1,7 +1,8 @@
 /**
  * Movimiento del sitio. Todo parte de la clase `movido` que pone el script del <head>
- * solo cuando hay JS y no hay prefers-reduced-motion. Sin esa clase, el contenido se
- * muestra quieto y completo.
+ * cuando hay JS (sin JS el contenido se muestra quieto y completo). Si el sistema pide
+ * reducir movimiento, también pone `suave`: se mantienen los fundidos y se quitan
+ * desplazamientos, zoom, parallax, scroll con inercia y ondas.
  *
  * - intro de la primera visita y arranque de la portada
  * - revelados al entrar en pantalla ([data-revelar])
@@ -13,6 +14,7 @@ import Lenis from 'lenis';
 
 const raiz = document.documentElement;
 const fino = matchMedia('(hover: hover) and (pointer: fine)');
+const suave = raiz.classList.contains('suave');
 
 export let lenis: Lenis | null = null;
 
@@ -22,6 +24,7 @@ function iniciar() {
   introYPortada();
   revelados();
   palabras();
+  if (suave) return;
   parallax();
   if (fino.matches) {
     scrollSuave();
@@ -32,8 +35,12 @@ function iniciar() {
 /* ---------- intro y portada ---------- */
 function introYPortada() {
   const portada = document.querySelector<HTMLElement>('[data-revelar="portada"]');
+  const seccion = document.querySelector<HTMLElement>('[data-portada]');
   const intro = document.querySelector<HTMLElement>('[data-intro]');
-  const arrancar = () => portada?.classList.add('visto');
+  const arrancar = () => {
+    portada?.classList.add('visto');
+    seccion?.classList.add('visto');
+  };
 
   if (raiz.classList.contains('con-intro') && intro) {
     let listo = false;
@@ -180,7 +187,7 @@ function imanes() {
 }
 
 /* ---------- el agua responde: ondas al tocar y reflejo que se agita ---------- */
-if (raiz.classList.contains('movido')) {
+if (raiz.classList.contains('movido') && !suave) {
   agua();
   reflejoVivo();
 }

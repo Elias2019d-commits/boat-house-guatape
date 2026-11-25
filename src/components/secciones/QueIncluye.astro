@@ -2,7 +2,6 @@
 import { Picture } from 'astro:assets';
 import TituloAgua from '../TituloAgua.astro';
 import Icono from '../Icono.astro';
-import EscenaIncluye from '../EscenaIncluye.astro';
 import { titulos, incluyeFotos } from '../../data/fotos';
 
 const incluye = [
@@ -11,10 +10,9 @@ const incluye = [
   { icono: 'kayak', texto: 'Kayak' },
   { icono: 'paddle', texto: 'Paddle board' },
   { icono: 'malla', texto: 'Malla catamarán' },
-  { icono: 'bbq', texto: 'Zona BBQ' },
+  { icono: 'bbq', texto: 'Zona BBQ y parlante JBL' },
   { icono: 'cocina', texto: 'Cocina dotada' },
   { icono: 'wifi', texto: 'Wifi y TV' },
-  { icono: 'parlante', texto: 'Parlante JBL' },
   { icono: 'cama', texto: 'Cama queen' },
 ] as const;
 ---
@@ -53,7 +51,7 @@ const incluye = [
                 data-clave={i.icono}
                 style={f?.pos ? `--pos:${f.pos}` : undefined}
               >
-                {f ? (
+                {f && (
                   <Picture
                     src={f.src}
                     alt=""
@@ -62,8 +60,6 @@ const incluye = [
                     sizes="(min-width: 1000px) 46vw, 100vw"
                     loading="lazy"
                   />
-                ) : (
-                  <EscenaIncluye clave={i.icono as 'parlante'} />
                 )}
               </div>
             );
