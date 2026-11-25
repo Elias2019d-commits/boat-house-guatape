@@ -39,10 +39,12 @@ import { titulos } from '../../data/fotos';
     font-size: min(2.75rem, calc((100vw - 2 * var(--gutter)) / 6.2));
   }
 
+  /* en el celular, el texto va en una franja Noche que continúa la foto */
   .portada__pie {
     position: relative;
-    padding: var(--s-6) 0 var(--s-7);
-    color: var(--noche);
+    padding: var(--s-6) 0 var(--s-8);
+    background: var(--noche);
+    color: var(--bruma);
   }
 
   .portada__fila {
@@ -57,7 +59,11 @@ import { titulos } from '../../data/fotos';
     line-height: 1.55;
   }
 
+  /* reservar sobre fondo oscuro: Ocaso, como pide la propuesta */
   .portada__boton {
+    --fondo: var(--ocaso);
+    --tinta: var(--noche);
+    --relleno: var(--espuma);
     width: 100%;
     min-height: 52px;
   }
@@ -75,6 +81,7 @@ import { titulos } from '../../data/fotos';
       position: absolute;
       inset: auto 0 0;
       padding: 0 0 calc(var(--s-7) + env(safe-area-inset-bottom));
+      background: none;
       color: var(--espuma);
     }
 

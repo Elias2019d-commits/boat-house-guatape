@@ -26,10 +26,18 @@ function iniciar() {
   palabras();
   if (suave) return;
   parallax();
+  aguaViva();
   if (fino.matches) {
     scrollSuave();
     imanes();
   }
+}
+
+/* ---------- agua viva en la portada (WebGL, se carga aparte) ---------- */
+function aguaViva() {
+  const portada = document.querySelector<HTMLElement>('.escena--portada');
+  if (!portada) return;
+  import('./agua-gl').then((m) => m.iniciarAguaGL(portada)).catch(() => {});
 }
 
 /* ---------- intro y portada ---------- */
@@ -197,7 +205,7 @@ function agua() {
   let ultima = 0;
 
   const gota = (escena: HTMLElement, x: number, y: number, fuerza = 1) => {
-    if (activas > 8) return;
+    if (activas > 8 || escena.classList.contains('gl-activo')) return;
     const linea = escena.querySelector<HTMLElement>('[data-agua]')!.getBoundingClientRect().top;
     const r = escena.getBoundingClientRect();
     if (y < linea + 6) return; // solo sobre el agua, nunca en el cielo

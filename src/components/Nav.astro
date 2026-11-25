@@ -306,8 +306,11 @@ const links = [
       const r = el.getBoundingClientRect();
       return r.top <= y && r.bottom >= y;
     };
-    const enFoto = escenas.some(sobre);
-    const enOscuro = !enFoto && oscuras.some(sobre);
+    // la barra es transparente solo arriba de todo, sobre la portada; apenas se baja,
+    // toma fondo oscuro para que el logo no se mezcle con los títulos de las fotos
+    const foto = escenas.some(sobre);
+    const enFoto = foto && scrollY < 24;
+    const enOscuro = !enFoto && (foto || oscuras.some(sobre));
     nav.toggleAttribute('data-sobre-foto', enFoto);
     nav.toggleAttribute('data-oscuro', enOscuro);
     nav.toggleAttribute('data-tono', false);

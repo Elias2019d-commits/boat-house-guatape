@@ -12,6 +12,29 @@ const filtros = [
   { id: 'interior', texto: 'Interior' },
 ];
 
+// íconos de línea propios para cada filtro (pathLength=1 para dibujarlos)
+const iconos: Record<string, string> = {
+  todas:
+    '<rect class="c1" pathLength="1" x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect class="c2" pathLength="1" x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect class="c3" pathLength="1" x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect class="c4" pathLength="1" x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
+  dia: '<circle pathLength="1" cx="12" cy="12" r="4"/><g class="rayos"><path pathLength="1" d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></g>',
+  atardecer:
+    '<path pathLength="1" d="M2.5 17.5h19"/><g class="sol"><path pathLength="1" d="M6.5 17.5a5.5 5.5 0 0 1 11 0"/><path pathLength="1" d="M12 7v2.2M5.6 10.6l1.5 1.5M18.4 10.6l-1.5 1.5"/></g><path pathLength="1" d="M8 20.5h8"/>',
+  noche:
+    '<path pathLength="1" d="M18.5 14.6A7.5 7.5 0 1 1 9.4 5.5a6 6 0 0 0 9.1 9.1z"/><path class="estrella" d="M17.5 3.2l.55 1.35 1.35.55-1.35.55-.55 1.35-.55-1.35-1.35-.55 1.35-.55z"/>',
+  interior:
+    '<path pathLength="1" d="M4 11.2 12 4.5l8 6.7V20H4z"/><rect class="ventana" pathLength="1" x="9.5" y="12.5" width="5" height="4.5" rx="0.5"/>',
+};
+
+// estrellas de la noche: posiciones fijas (pseudoaleatorias) para que no cambien entre visitas
+let semilla = 7;
+const azar = () => ((semilla = (semilla * 9301 + 49297) % 233280) / 233280);
+const estrellas = Array.from({ length: 46 }, () => ({
+  x: (azar() * 100).toFixed(1),
+  y: (azar() * 70).toFixed(1),
+  t: (1 + azar() * 1.6).toFixed(1),
+  d: (azar() * 4).toFixed(1),
+}));
+
 const fotos = await Promise.all(
   galeria.map(async (f) => {
     const grande = await getImage({ src: f.src, width: Math.min(1800, f.src.width), format: 'webp' });
@@ -32,15 +55,38 @@ const fotos = await Promise.all(
   <div class="seccion__cuerpo galeria__cuerpo" data-galeria>
     <div class="pista" data-pista>
     <div class="pista__ventana">
+    <!-- el cielo de la galería cambia con el filtro elegido -->
+    <div class="animo" aria-hidden="true" data-animo="todas">
+      <span class="animo__capa animo__capa--dia"></span>
+      <span class="animo__capa animo__capa--atardecer"></span>
+      <span class="animo__capa animo__capa--noche">
+        {estrellas.map((e) => <i style={`left:${e.x}%;top:${e.y}%;--t:${e.t}px;--d:${e.d}s`}></i>)}
+      </span>
+      <span class="animo__capa animo__capa--interior"></span>
+    </div>
     <div class="marco galeria__barra">
-      <div class="filtros" role="group" aria-label="Filtrar fotos por momento del día">
-        {
-          filtros.map((f, i) => (
-            <button type="button" class="filtro" aria-pressed={i === 0 ? 'true' : 'false'} data-filtro={f.id}>
-              {f.texto}
-            </button>
-          ))
-        }
+      <div class="filtros" data-filtros>
+        <div class="filtros__fila" role="group" aria-label="Filtrar fotos por momento del día">
+          {
+            filtros.map((f, i) => (
+              <button type="button" class="filtro" aria-pressed={i === 0 ? 'true' : 'false'} data-filtro={f.id}>
+                <svg class={`filtro__icono icono-${f.id}`} viewBox="0 0 24 24" aria-hidden="true" set:html={iconos[f.id]} />
+                <span>{f.texto}</span>
+              </button>
+            ))
+          }
+        </div>
+        <!-- copia del selector en colores "activos", recortada a la opción elegida -->
+        <div class="filtros__fila filtros__activa" aria-hidden="true" data-activa>
+          {
+            filtros.map((f) => (
+              <span class="filtro" data-en={f.id}>
+                <svg class={`filtro__icono icono-${f.id}`} viewBox="0 0 24 24" set:html={iconos[f.id]} />
+                <span>{f.texto}</span>
+              </span>
+            ))
+          }
+        </div>
       </div>
       <div class="galeria__nav">
         <button type="button" class="galeria__flecha" data-anterior aria-label="Fotos anteriores">
@@ -103,8 +149,8 @@ const fotos = await Promise.all(
 
 <style>
   .galeria__barra {
-    /* fondo propio (el mismo Embalse de la sección) para que el contraste sea medible */
-    background: var(--embalse);
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -112,49 +158,325 @@ const fotos = await Promise.all(
     margin-bottom: var(--s-6);
   }
 
+  /* selector: dos filas iguales; la de arriba (activa) se recorta a la opción elegida */
   .filtros {
-    display: flex;
-    gap: var(--s-4);
+    position: relative;
     min-width: 0;
+    max-width: 100%;
+    padding: 4px;
+    border-radius: var(--r-pill);
+    background: #1b2a25;
+    border: 1px solid color-mix(in srgb, var(--agua) 40%, transparent);
     overflow-x: auto;
     scrollbar-width: none;
+    overscroll-behavior-x: contain;
   }
 
-  @media (min-width: 600px) {
-    .filtros {
-      gap: var(--s-5);
-    }
+  .filtros::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filtros__fila {
+    display: flex;
+    gap: 2px;
+    width: max-content;
   }
 
   .filtro {
     position: relative;
     flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     min-height: 44px;
-    padding-inline: 2px;
+    padding: 0 16px 0 13px;
+    border-radius: var(--r-pill);
     font-size: 0.9375rem;
-    color: color-mix(in srgb, var(--bruma) 72%, transparent);
-    transition: color var(--d-corta) var(--ease-out);
+    font-weight: 500;
+    color: var(--bruma);
+    white-space: nowrap;
   }
 
-  .filtro::after {
-    content: '';
+  .filtro__icono {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+
+  .filtros__fila:not(.filtros__activa) .filtro__icono {
+    color: #9fb3ad;
+  }
+
+  .filtros__activa {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 8px;
-    height: 1px;
+    top: 4px;
+    left: 4px;
     background: var(--espuma);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform var(--d-corta) var(--ease-out);
+    pointer-events: none;
+    clip-path: inset(0 100% 0 0 round 999px);
+    transition: clip-path 620ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .filtro[aria-pressed='true'] {
-    color: var(--espuma);
+  .filtros__activa .filtro {
+    color: var(--noche);
   }
 
-  .filtro[aria-pressed='true']::after {
-    transform: scaleX(1);
+  .filtros__activa .filtro__icono {
+    color: var(--embalse);
+  }
+
+  .filtros__activa .estrella,
+  .filtros__activa .ventana {
+    fill: currentColor;
+  }
+
+  .filtros__fila:not(.filtros__activa) .estrella {
+    fill: currentColor;
+  }
+
+  /* ---------- el ícono de la opción elegida se dibuja ---------- */
+  .filtros__activa .dibuja .filtro__icono :is(path, circle, rect) {
+    stroke-dasharray: 1;
+    animation: trazo 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .filtros__activa .dibuja .estrella {
+    stroke-dasharray: none;
+    animation: estrella-aparece 900ms cubic-bezier(0.16, 1, 0.3, 1) 350ms both;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .filtros__activa .dibuja .rayos {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rayos 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .filtros__activa .dibuja .sol {
+    animation: sale-sol 1000ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .filtros__activa .dibuja .ventana {
+    stroke-dasharray: none;
+    animation: luz 900ms ease 450ms both;
+  }
+
+  .filtros__activa .dibuja :is(.c1, .c2, .c3, .c4) {
+    stroke-dasharray: none;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: cuadro 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .filtros__activa .dibuja .c2 {
+    animation-delay: 70ms;
+  }
+  .filtros__activa .dibuja .c3 {
+    animation-delay: 140ms;
+  }
+  .filtros__activa .dibuja .c4 {
+    animation-delay: 210ms;
+  }
+
+  @keyframes trazo {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes estrella-aparece {
+    0% {
+      transform: scale(0) rotate(-90deg);
+      opacity: 0;
+    }
+    100% {
+      transform: none;
+      opacity: 1;
+    }
+  }
+
+  @keyframes rayos {
+    from {
+      transform: rotate(-70deg) scale(0.6);
+      opacity: 0;
+    }
+  }
+
+  @keyframes sale-sol {
+    from {
+      transform: translateY(5px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes luz {
+    from {
+      fill-opacity: 0;
+    }
+    to {
+      fill-opacity: 1;
+    }
+  }
+
+  @keyframes cuadro {
+    from {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+  }
+
+  :global(html.suave) .filtros__activa {
+    transition: none;
+  }
+
+  :global(html.suave) .filtros__activa .dibuja * {
+    animation: none !important;
+  }
+
+  /* ---------- el cielo de la galería ---------- */
+  .pista__ventana {
+    position: relative;
+  }
+
+  .animo {
+    position: absolute;
+    inset: calc(var(--s-8) * -1) 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    /* sin bordes: el cielo se funde arriba y abajo con la sección */
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+  }
+
+  .animo__capa {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1100ms ease;
+  }
+
+  .animo__capa--dia {
+    background:
+      radial-gradient(90% 60% at 15% 0%, rgb(173 196 188 / 0.38), rgb(173 196 188 / 0) 70%),
+      radial-gradient(70% 50% at 90% 15%, rgb(246 247 243 / 0.1), rgb(246 247 243 / 0) 70%);
+  }
+
+  .animo__capa--atardecer {
+    background:
+      radial-gradient(90% 65% at 85% 100%, rgb(232 164 95 / 0.38), rgb(232 164 95 / 0) 65%),
+      radial-gradient(70% 50% at 10% 0%, rgb(140 91 54 / 0.35), rgb(140 91 54 / 0) 70%);
+  }
+
+  .animo__capa--noche {
+    background: rgb(19 32 29 / 0.88);
+  }
+
+  .animo__capa--noche i {
+    position: absolute;
+    width: var(--t);
+    height: var(--t);
+    border-radius: 50%;
+    background: var(--espuma);
+    opacity: 0.2;
+    animation: titila 3.2s ease-in-out var(--d) infinite alternate;
+    animation-play-state: paused;
+  }
+
+  .animo[data-animo='noche'] .animo__capa--noche i {
+    animation-play-state: running;
+  }
+
+  @keyframes titila {
+    from {
+      opacity: 0.15;
+    }
+    to {
+      opacity: 0.85;
+    }
+  }
+
+  .animo__capa--interior {
+    background:
+      radial-gradient(70% 55% at 50% 45%, rgb(140 91 54 / 0.5), rgb(140 91 54 / 0) 72%),
+      radial-gradient(40% 30% at 50% 40%, rgb(232 164 95 / 0.14), rgb(232 164 95 / 0) 70%);
+  }
+
+  .animo[data-animo='dia'] .animo__capa--dia,
+  .animo[data-animo='atardecer'] .animo__capa--atardecer,
+  .animo[data-animo='noche'] .animo__capa--noche,
+  .animo[data-animo='interior'] .animo__capa--interior {
+    opacity: 1;
+  }
+
+  :global(html.suave) .animo__capa--noche i {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  .tira,
+  .pista__pie {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- al cambiar de filtro: salen hacia el agua y entran desde el horizonte ---------- */
+  :global(html.movido) .tira.sale .tira__item {
+    opacity: 0 !important;
+    transform: translateY(18px) !important;
+    transition:
+      opacity 220ms ease,
+      transform 220ms ease !important;
+    transition-delay: 0s !important;
+  }
+
+  :global(html.movido) .tira.entra .tira__item {
+    animation: desde-horizonte 900ms cubic-bezier(0.76, 0, 0.18, 1) both;
+    animation-delay: calc(var(--n, 0) * 75ms);
+  }
+
+  :global(html.movido) .tira.entra .tira__item :global(img) {
+    animation: acerca-foto 1400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--n, 0) * 75ms);
+  }
+
+  @keyframes desde-horizonte {
+    from {
+      clip-path: inset(50% 0 50% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes acerca-foto {
+    from {
+      scale: 1.25;
+    }
+    to {
+      scale: 1;
+    }
+  }
+
+  :global(html.suave) .tira.entra .tira__item,
+  :global(html.suave) .tira.entra .tira__item :global(img) {
+    animation: fundido-galeria 500ms ease both;
+  }
+
+  @keyframes fundido-galeria {
+    from {
+      opacity: 0;
+    }
   }
 
   .galeria__nav {
@@ -239,9 +561,18 @@ const fotos = await Promise.all(
     transform: scale(0.985);
   }
 
-  .tira__boton :global(img) {
+  /* la foto llena siempre su marco, sea vertical, cuadrada u horizontal */
+  .tira__boton :global(picture) {
+    display: block;
     width: 100%;
     height: 100%;
+  }
+
+  .tira__boton :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
     object-fit: cover;
   }
 
@@ -479,8 +810,40 @@ const fotos = await Promise.all(
     interior: 'fotos del interior',
   };
 
-  function filtrar(id: string) {
-    filtros.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filtro === id)));
+  const reducir = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // ---------- selector: la opción elegida se recorta sobre la copia "activa" ----------
+  const caja = raiz.querySelector<HTMLElement>('[data-filtros]')!;
+  const activa = raiz.querySelector<HTMLElement>('[data-activa]')!;
+  const animo = raiz.querySelector<HTMLElement>('[data-animo]')!;
+  let filtroActual = 'todas';
+
+  function marcar(id: string, animar = true) {
+    const b = filtros.find((x) => x.dataset.filtro === id)!;
+    const w = activa.offsetWidth;
+    const h = activa.offsetHeight;
+    // el botón y su copia ocupan el mismo lugar; las medidas son relativas a la fila
+    const l = b.offsetLeft - activa.offsetLeft;
+    const t = b.offsetTop - activa.offsetTop;
+    if (!animar) activa.style.transition = 'none';
+    activa.style.clipPath = `inset(${t}px ${w - l - b.offsetWidth}px ${h - t - b.offsetHeight}px ${l}px round 999px)`;
+    if (!animar) {
+      void activa.offsetWidth;
+      activa.style.transition = '';
+      return;
+    }
+    const copia = activa.querySelector<HTMLElement>(`[data-en="${id}"]`)!;
+    activa.querySelectorAll('.dibuja').forEach((x) => x.classList.remove('dibuja'));
+    void copia.offsetWidth;
+    copia.classList.add('dibuja');
+    // en el celular, la opción elegida queda a la vista dentro del selector
+    caja.scrollTo({
+      left: b.offsetLeft - (caja.clientWidth - b.offsetWidth) / 2,
+      behavior: reducir.matches ? 'instant' : 'smooth',
+    } as ScrollToOptions);
+  }
+
+  function aplicar(id: string) {
     let n = 0;
     items.forEach((li) => {
       const ver = id === 'todas' || li.dataset.momento === id;
@@ -489,11 +852,44 @@ const fotos = await Promise.all(
     });
     tira.scrollTo({ left: 0, behavior: 'instant' as ScrollBehavior });
     conteo.textContent = `${n} ${nombres[id]}`;
+    numerar();
+    medirPista();
+    if (pista.classList.contains('fija')) {
+      const top = pista.getBoundingClientRect().top + scrollY;
+      if (scrollY > top) scrollTo({ top, behavior: 'instant' as ScrollBehavior });
+    }
     flechas();
   }
-  filtros.forEach((b) => b.addEventListener('click', () => filtrar(b.dataset.filtro!)));
 
-  const reducir = matchMedia('(prefers-reduced-motion: reduce)');
+  let espera = 0;
+  function filtrar(id: string) {
+    if (id === filtroActual) return;
+    filtroActual = id;
+    filtros.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filtro === id)));
+    marcar(id);
+    animo.dataset.animo = id;
+    if (!document.documentElement.classList.contains('movido')) {
+      aplicar(id);
+      return;
+    }
+    // las fotos actuales se hunden, cambian, y las nuevas se abren desde el horizonte
+    clearTimeout(espera);
+    tira.classList.remove('entra');
+    tira.classList.add('sale');
+    espera = window.setTimeout(() => {
+      aplicar(id);
+      tira.classList.remove('sale');
+      void tira.offsetWidth;
+      tira.classList.add('entra');
+      espera = window.setTimeout(() => tira.classList.remove('entra'), 2200);
+    }, 230);
+  }
+  filtros.forEach((b) => b.addEventListener('click', () => filtrar(b.dataset.filtro!)));
+  // posición inicial del recorte, y de nuevo cuando cargan las fuentes o cambia el tamaño
+  requestAnimationFrame(() => marcar(filtroActual, false));
+  document.fonts?.ready.then(() => marcar(filtroActual, false));
+  new ResizeObserver(() => marcar(filtroActual, false)).observe(caja);
+
   function mover(dir: 1 | -1) {
     tira.scrollBy({ left: dir * tira.clientWidth * 0.8, behavior: reducir.matches ? 'instant' : 'smooth' });
   }
@@ -666,16 +1062,6 @@ const fotos = await Promise.all(
     ).observe(pista);
   }
 
-  filtros.forEach((b) =>
-    b.addEventListener('click', () => {
-      numerar();
-      medirPista();
-      if (pista.classList.contains('fija')) {
-        const top = pista.getBoundingClientRect().top + scrollY;
-        if (scrollY > top) scrollTo({ top, behavior: 'instant' as ScrollBehavior });
-      }
-    }),
-  );
   medirPista();
 
 </script>

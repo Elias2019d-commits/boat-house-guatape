@@ -32,6 +32,7 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
   style={`--ratio:${ratio.toFixed(4)};--hz:${foto.horizonte};--fx:${foto.foco};--meta:${foto.meta ?? (portada ? 0.6 : 0.58)};--alto:${alto}`}
   data-escena
   data-revelar={portada ? 'portada' : 'escena'}
+  data-mascara={foto.mascara ? `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}${foto.mascara}` : undefined}
 >
   <div class="escena__capa" data-parallax={portada ? '0.3' : '0.07'}>
   <div class="escena__foto">
@@ -283,7 +284,22 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
     transition: clip-path 1500ms cubic-bezier(0.76, 0, 0.18, 1) 380ms;
   }
 
-  :global(html.movido) .escena__foto :global(img) {
+  /* agua viva (WebGL): el canvas reemplaza a la foto cuando ya dibujó */
+  .escena__foto :global(canvas.agua-gl) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: pan-y;
+  }
+
+  .escena.gl-activo .escena__foto :global(picture) {
+    visibility: hidden;
+  }
+
+  :global(html.movido) .escena__foto :global(img),
+  :global(html.movido) .escena__foto :global(canvas.agua-gl) {
     transform: scale(1.22);
     transition: transform 2600ms cubic-bezier(0.16, 1, 0.3, 1) 380ms;
   }
@@ -333,7 +349,8 @@ const bloques = (grupos ?? [texto]).map((g) => g.split(' ').map((p) => ({ p, i: 
     clip-path: inset(0 0 0 0);
   }
 
-  :global(html.movido) .escena.visto .escena__foto :global(img) {
+  :global(html.movido) .escena.visto .escena__foto :global(img),
+  :global(html.movido) .escena.visto .escena__foto :global(canvas.agua-gl) {
     transform: scale(1);
   }
 

@@ -20,6 +20,7 @@ import casaNocheEstrellas from '../assets/fotos/casa-noche-estrellas.jpg';
 import jacuzziPanoramica from '../assets/fotos/jacuzzi-espuma-panoramica.jpg';
 import casaNocheLuces from '../assets/fotos/casa-noche-luces.jpg';
 import zonaBbq from '../assets/fotos/zona-bbq.jpg';
+import livingPenol from '../assets/fotos/living-penol.jpg';
 import casaCanoaPenol from '../assets/fotos/casa-canoa-penol.jpg';
 import terrazaDia from '../assets/fotos/terraza-dia.jpg';
 import jetskiPaddlePenol from '../assets/fotos/jetski-paddle-penol.jpg';
@@ -55,6 +56,8 @@ export interface FotoTitulo {
   foco: number;
   /** altura de la escena (0 a 1) donde se quiere ver la línea del agua. Por defecto 0.58 (0.6 en la portada) */
   meta?: number;
+  /** solo portada: imagen en public/ que marca el agua (blanco) y la casa (negro) para el agua viva */
+  mascara?: string;
 }
 
 export const titulos = {
@@ -63,6 +66,9 @@ export const titulos = {
     alt: 'La casa flotante de dos niveles sobre el agua quieta al atardecer, con la palma y el parasol en la terraza.',
     horizonte: 0.575,
     foco: 0.58,
+    // TODO: si se cambia la foto de portada, rehacer esta máscara (o quitarla: sin ella todo
+    // lo que está debajo del horizonte se mueve como agua)
+    mascara: 'agua/portada.png',
   },
   casa: {
     src: casaNocheEstrellas,
@@ -71,10 +77,10 @@ export const titulos = {
     foco: 0.62,
   },
   incluye: {
-    src: terrazaDia,
-    alt: 'La terraza de arriba con césped, sillas, parasol y una palma, frente al embalse en un día despejado.',
-    horizonte: 0.53,
-    foco: 0.5,
+    src: livingPenol,
+    alt: 'La sala con el sofá y los ventanales abiertos al jacuzzi, la malla y el embalse, con la Piedra del Peñol al fondo.',
+    horizonte: 0.467,
+    foco: 0.42,
   },
   agua: {
     src: jetskiPaddlePenol,

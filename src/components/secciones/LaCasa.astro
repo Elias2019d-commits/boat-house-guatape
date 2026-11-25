@@ -38,6 +38,13 @@ import { titulos, casa } from '../../data/fotos';
 </section>
 
 <style>
+  /* en el celular, la foto de la casa sigue directo a la franja oscura de la portada */
+  @media (max-width: 719px) {
+    #la-casa {
+      padding-top: 0;
+    }
+  }
+
   .casa {
     display: grid;
     gap: var(--s-8);
