@@ -334,3 +334,22 @@ html.suave .visor-incluye__foto.arriba.entra img {
     opacity: 0;
   }
 }
+
+
+/* ---------- pieza "todo incluido": sube del agua y se asienta ---------- */
+html.movido [data-revelar='flyer'] {
+  opacity: 0;
+  transform: translateY(48px) scale(0.94);
+  transition:
+    opacity 1200ms var(--ease-expo),
+    transform 1600ms var(--ease-expo);
+}
+
+html.movido [data-revelar='flyer'].visto {
+  opacity: 1;
+  transform: none;
+}
+
+html.suave [data-revelar='flyer'] {
+  transform: none !important;
+}

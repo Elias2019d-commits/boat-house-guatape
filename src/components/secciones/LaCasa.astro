@@ -1,11 +1,54 @@
 ---
 import { Picture } from 'astro:assets';
-import TituloAgua from '../TituloAgua.astro';
-import { titulos, casa } from '../../data/fotos';
+import { casa, flyer } from '../../data/fotos';
+import precios from '../../data/precios.json';
+import { pesos } from '../../lib/precios';
+
+const base = precios.planes[0];
 ---
 
 <section id="la-casa" class="seccion" aria-labelledby="titulo-casa" data-momento="manana">
-  <TituloAgua foto={titulos.casa} texto="La casa" id="titulo-casa" />
+  <!-- todo lo que incluye, de un vistazo: la pieza de la clienta, fundida con la página -->
+  <div class="flyer" data-tono="oscuro">
+    <!-- en computadora: columna editorial al lado de la pieza; en el celular solo queda el título (oculto) -->
+    <div class="flyer__lado">
+      <h2 id="titulo-casa" class="titulo flyer__titulo">La casa</h2>
+      <div class="flyer__extra" data-revelar="grupo">
+        <p class="frase">Todo lo que incluye tu noche, en una sola mirada.</p>
+        <dl class="flyer__precios">
+          <div>
+            <dt>Lunes a jueves</dt>
+            <dd>{pesos(base.semana as number)}</dd>
+          </div>
+          <div>
+            <dt>Viernes a domingo</dt>
+            <dd>{pesos(base.finde as number)}</dd>
+          </div>
+        </dl>
+        <p class="flyer__nota">Por pareja, por noche. Check-in a las 3:00 p. m. y check-out a las 12:00 m.</p>
+        <a href="#reserva" class="boton boton--ocaso" data-iman>Ver fechas disponibles</a>
+      </div>
+    </div>
+    <!-- luz ambiente: la misma pieza, agrandada y desenfocada detrás -->
+    <div class="flyer__fondo" aria-hidden="true">
+      <div class="flyer__ambiente" data-parallax="0.08">
+        <Picture src={flyer.src} alt="" formats={['webp']} widths={[240]} sizes="240px" quality={60} />
+      </div>
+    </div>
+    <figure class="flyer__foto" data-revelar="flyer">
+      <div class="flyer__inclina" data-inclina>
+      <Picture
+        src={flyer.src}
+        alt={flyer.alt}
+        formats={['avif', 'webp']}
+        widths={[480, 720, 1080]}
+        sizes="(min-width: 900px) 50vh, 100vw"
+        quality={85}
+      />
+      <span class="flyer__brillo" aria-hidden="true"></span>
+      </div>
+    </figure>
+  </div>
 
   <div class="marco seccion__cuerpo casa">
     <div class="casa__texto" data-revelar="grupo">
@@ -40,6 +83,210 @@ import { titulos, casa } from '../../data/fotos';
 </section>
 
 <style>
+  .flyer {
+    position: relative;
+    overflow: hidden;
+    background: var(--noche);
+    padding: 0;
+  }
+
+  .flyer__fondo {
+    position: absolute;
+    inset: 0;
+  }
+
+  .flyer__ambiente {
+    position: absolute;
+    inset: -10% 0;
+  }
+
+  .flyer__ambiente :global(picture),
+  .flyer__ambiente :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .flyer__ambiente :global(img) {
+    object-fit: cover;
+    filter: blur(40px) saturate(1.25);
+    opacity: 0.55;
+    transform: scale(1.3);
+  }
+
+  /* el ambiente se apaga hacia arriba y abajo para unirse con la página */
+  .flyer__fondo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--noche), rgb(19 32 29 / 0.35) 25%, rgb(19 32 29 / 0.35) 75%, var(--noche));
+  }
+
+  /* la pieza sin marco: sus bordes se funden con el fondo */
+  .flyer__foto {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  .flyer__foto :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* celular: solo la pieza; el título queda para lectores de pantalla */
+  .flyer__lado {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .flyer__extra {
+    display: none;
+  }
+
+  .flyer__inclina {
+    position: relative;
+  }
+
+  /* computadora: composición editorial, la pieza flota como una tarjeta */
+  @media (min-width: 900px) {
+    .flyer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: clamp(48px, 7vw, 120px);
+      min-height: 100svh;
+      padding: var(--s-8) max(var(--gutter), calc((100vw - var(--ancho)) / 2));
+    }
+
+    .flyer__lado {
+      position: relative;
+      z-index: 1;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+      display: grid;
+      gap: var(--s-6);
+      max-width: 480px;
+      justify-self: end;
+    }
+
+    .flyer__titulo {
+      color: var(--espuma);
+      font-size: clamp(3rem, 2rem + 2.6vw, 4.5rem);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .flyer__extra {
+      display: grid;
+      gap: var(--s-6);
+      justify-items: start;
+    }
+
+    .flyer__extra .frase {
+      color: var(--bruma);
+    }
+
+    .flyer__precios {
+      display: flex;
+      gap: var(--s-7);
+      margin: 0;
+      padding-top: var(--s-5);
+      border-top: 1px solid color-mix(in srgb, var(--agua) 45%, transparent);
+    }
+
+    .flyer__precios dt {
+      font-size: var(--t-detalle);
+      color: var(--bruma);
+    }
+
+    .flyer__precios dd {
+      margin: var(--s-1) 0 0;
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 2rem;
+      line-height: 1.1;
+      color: var(--espuma);
+      font-variant-numeric: lining-nums;
+    }
+
+    .flyer__nota {
+      font-size: var(--t-detalle);
+      color: var(--bruma);
+    }
+
+    .flyer__foto {
+      position: relative;
+      z-index: 1;
+      width: auto;
+      height: min(84svh, 880px);
+      aspect-ratio: 9 / 16;
+      margin: 0;
+      overflow: visible;
+      perspective: 1400px;
+    }
+
+    .flyer__inclina {
+      height: 100%;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow:
+        0 40px 80px -30px rgb(0 0 0 / 0.65),
+        0 0 0 1px rgb(246 247 243 / 0.08);
+      transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+      transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+
+    .flyer__inclina :global(picture),
+    .flyer__inclina :global(img) {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .flyer__inclina :global(img) {
+      object-fit: cover;
+    }
+  }
+
+  /* un brillo que cruza la pieza de vez en cuando */
+  .flyer__brillo {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 0.16) 50%, transparent 62%);
+    transform: translateX(-130%);
+    pointer-events: none;
+  }
+
+  :global(html.movido) .flyer__foto.visto .flyer__brillo {
+    animation: brillo 7s cubic-bezier(0.45, 0, 0.25, 1) 1.3s infinite;
+  }
+
+  @keyframes brillo {
+    0% {
+      transform: translateX(-130%);
+    }
+    25%,
+    100% {
+      transform: translateX(130%);
+    }
+  }
+
+  :global(html.suave) .flyer__brillo {
+    display: none;
+  }
+
+
   /* en el celular, la foto de la casa sigue directo a la franja oscura de la portada */
   @media (max-width: 719px) {
     #la-casa {
@@ -105,3 +352,24 @@ import { titulos, casa } from '../../data/fotos';
     }
   }
 </style>
+
+<script>
+  const tarjeta = document.querySelector<HTMLElement>('[data-inclina]');
+  const zona = document.querySelector<HTMLElement>('.flyer');
+  const puede =
+    matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !document.documentElement.classList.contains('suave');
+  if (tarjeta && zona && puede) {
+    zona.addEventListener('pointermove', (e) => {
+      const r = tarjeta.getBoundingClientRect();
+      const x = (e.clientX - (r.left + r.width / 2)) / r.width;
+      const y = (e.clientY - (r.top + r.height / 2)) / r.height;
+      tarjeta.style.setProperty('--ry', `${Math.max(-1, Math.min(1, x)) * 7}deg`);
+      tarjeta.style.setProperty('--rx', `${Math.max(-1, Math.min(1, y)) * -5}deg`);
+    });
+    zona.addEventListener('pointerleave', () => {
+      tarjeta.style.setProperty('--rx', '0deg');
+      tarjeta.style.setProperty('--ry', '0deg');
+    });
+  }
+</script>

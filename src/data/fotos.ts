@@ -22,6 +22,13 @@ import casaNocheLuces from '../assets/fotos/casa-noche-luces.jpg';
 import zonaBbq from '../assets/fotos/zona-bbq.jpg';
 import livingPenol from '../assets/fotos/living-penol.jpg';
 import bano from '../assets/fotos/bano.jpg';
+// pieza de la clienta con precios y todo lo que incluye (va entera, sin recortar)
+import incluyeTodo from '../assets/fotos/incluye-todo.jpg';
+
+export const flyer = {
+  src: incluyeTodo,
+  alt: 'Boat House Guatapé. Semana, lunes a jueves: $550.000 por pareja por noche. Fin de semana, viernes a domingo: $700.000 por pareja por noche. Check-in 3:00 p. m., check-out 12:00 m. Incluye: embalse de Guatapé, jacuzzi privado, ingredientes para el desayuno, kayak, cama queen, zona BBQ, wifi y TV, malla catamarán, cocina dotada, parlante JBL, paddle board y transporte en lancha. Mini-bar con bebidas y mecato con valor adicional.',
+};
 import casaCanoaPenol from '../assets/fotos/casa-canoa-penol.jpg';
 import terrazaDia from '../assets/fotos/terraza-dia.jpg';
 import jetskiPaddlePenol from '../assets/fotos/jetski-paddle-penol.jpg';
@@ -152,6 +159,7 @@ export const galeria: FotoGaleria[] = [
   { src: livingJacuzzi, momento: 'interior', alt: 'El sofá frente al ventanal, con el jacuzzi, la malla y el Peñol afuera.' },
   { src: interiorNoche, momento: 'noche', alt: 'Noche de película desde la cama, con velas en la cubierta y las luces del pueblo al fondo.' },
   { src: terrazaDia, momento: 'dia', alt: 'La terraza de arriba con césped, parasol y una palma, frente al embalse.' },
+  { src: casaNocheEstrellas, momento: 'noche', alt: 'La casa flotante iluminada de noche bajo un cielo con estrellas, con las luces del pueblo reflejadas en el agua.' },
   { src: lancha, momento: 'dia', alt: 'La lancha del traslado en el muelle, con la Piedra del Peñol al fondo.' },
   { src: bano, momento: 'interior', alt: 'El baño con ducha, lavamanos de madera y ventanales altos con luz de la tarde.' },
   { src: jacuzziEspuma, momento: 'atardecer', alt: 'Espuma desbordando el jacuzzi mientras el cielo se pone naranja sobre la orilla.' },
