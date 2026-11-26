@@ -1,6 +1,8 @@
 ---
 import Logo from '../Logo.astro';
 import Despedida from '../Despedida.astro';
+import { Picture } from 'astro:assets';
+import { politicas } from '../../data/fotos';
 
 const redes = [
   { href: 'https://wa.me/573117197851', nombre: 'WhatsApp', valor: '+57 311 719 7851' },
@@ -41,6 +43,23 @@ const redes = [
     </div>
   </div>
 
+  <!-- políticas de reserva: la pieza de la clienta, entera -->
+  <div class="politicas" aria-labelledby="titulo-politicas">
+    <div class="marco politicas__marco">
+      <h2 id="titulo-politicas" class="titulo politicas__titulo" data-revelar="sube" data-emerge>Políticas de reserva</h2>
+      <figure class="politicas__foto" data-revelar="flyer">
+        <Picture
+          src={politicas.src}
+          alt={politicas.alt}
+          formats={['avif', 'webp']}
+          widths={[480, 720, 1000, 1206]}
+          sizes="(min-width: 720px) 480px, 100vw"
+          quality={85}
+        />
+      </figure>
+    </div>
+  </div>
+
   <Despedida />
 
   <footer class="marco pie">
@@ -50,6 +69,67 @@ const redes = [
 </section>
 
 <style>
+  .politicas {
+    margin-top: var(--s-10);
+  }
+
+  .politicas__marco {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .politicas__titulo {
+    color: var(--espuma);
+  }
+
+  /* en el celular el título ya está en la pieza: queda solo para lectores de pantalla */
+  @media (max-width: 899px) {
+    .politicas__titulo {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+  }
+
+  /* en el celular, de borde a borde; los bordes de la pieza se funden con la noche */
+  .politicas__foto {
+    margin: 0 calc(var(--gutter) * -1);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .politicas__foto :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (min-width: 900px) {
+    .politicas__marco {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 24px;
+      align-items: start;
+    }
+    .politicas__titulo {
+      grid-column: 1 / span 4;
+      position: sticky;
+      top: 120px;
+    }
+    .politicas__foto {
+      grid-column: 6 / span 5;
+      margin: 0;
+      max-width: 480px;
+      border-radius: 4px;
+      overflow: hidden;
+      -webkit-mask-image: none;
+      mask-image: none;
+      box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.65);
+    }
+  }
+
   .contacto {
     padding-bottom: calc(var(--s-9) + 72px);
   }

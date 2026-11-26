@@ -24,6 +24,13 @@ import livingPenol from '../assets/fotos/living-penol.jpg';
 import bano from '../assets/fotos/bano.jpg';
 // pieza de la clienta con precios y todo lo que incluye (va entera, sin recortar)
 import incluyeTodo from '../assets/fotos/incluye-todo.jpg';
+import politicasImg from '../assets/fotos/politicas.jpg';
+
+// pieza de la clienta con las políticas de reserva (va entera, al final de la página)
+export const politicas = {
+  src: politicasImg,
+  alt: 'Políticas de reserva. Confirmación: la reserva se confirma únicamente con el pago del 50 % del valor total. Cambios de fecha: se permite un cambio de fecha con al menos 5 días de anticipación, sujeto a disponibilidad. No realizamos reembolsos por cancelaciones: en caso de no poder asistir, el cliente puede solicitar un cambio de fecha con al menos 5 días de anticipación, sujeto a disponibilidad; si el cliente no se presenta el día de la reserva, no hay reembolso ni cambio de fecha. No nos hacemos responsables por factores externos (clima, imprevistos personales) que impidan asistir a la reserva.',
+};
 
 export const flyer = {
   src: incluyeTodo,
