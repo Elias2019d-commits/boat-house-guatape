@@ -353,3 +353,98 @@ html.movido [data-revelar='flyer'].visto {
 html.suave [data-revelar='flyer'] {
   transform: none !important;
 }
+
+
+/* ---------- la barra llega después de abrir la portada ---------- */
+html.movido:not(.abierta) .nav__fila > * {
+  opacity: 0;
+  translate: 0 -14px;
+}
+
+html.movido .nav__fila > * {
+  transition:
+    opacity 900ms var(--ease-expo),
+    translate 1100ms var(--ease-expo);
+}
+
+html.movido .nav__fila > :nth-child(2) {
+  transition-delay: 90ms;
+}
+html.movido .nav__fila > :nth-child(3) {
+  transition-delay: 180ms;
+}
+html.movido .nav__fila > :nth-child(4) {
+  transition-delay: 120ms;
+}
+
+/* ---------- subtítulos: cada palabra sale del agua ---------- */
+[data-emerge] .em {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+
+[data-emerge] .em__in {
+  display: inline-block;
+}
+
+html.movido [data-emerge] .em__in {
+  transform: translateY(115%);
+  transition: transform 1100ms var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 55ms + 120ms);
+}
+
+html.movido .visto [data-emerge] .em__in,
+html.movido [data-emerge].visto .em__in {
+  transform: none;
+}
+
+html.suave [data-emerge] .em__in {
+  transform: none !important;
+}
+
+/* ---------- al bajar: las fotos se asientan y la galería enfoca la foto del centro ---------- */
+@supports (animation-timeline: view()) {
+  html.movido:not(.suave) :is(.casa__foto, .enagua__kayak) img {
+    animation: asienta linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 55%;
+  }
+
+  @keyframes asienta {
+    from {
+      scale: 1.18;
+    }
+    to {
+      scale: 1;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .tira__item {
+      scroll-snap-align: center;
+    }
+
+    html.movido:not(.suave) .tira__boton {
+      animation: foco linear both;
+      animation-timeline: view(inline);
+    }
+
+    @keyframes foco {
+      0% {
+        scale: 0.84;
+        opacity: 0.5;
+      }
+      50% {
+        scale: 1;
+        opacity: 1;
+      }
+      100% {
+        scale: 0.84;
+        opacity: 0.5;
+      }
+    }
+  }
+}

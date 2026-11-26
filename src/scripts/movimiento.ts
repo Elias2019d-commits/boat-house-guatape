@@ -11,6 +11,7 @@
  * - botones magnéticos ([data-iman]) en desktop
  */
 import Lenis from 'lenis';
+import { pesos } from '../lib/precios';
 
 const raiz = document.documentElement;
 const fino = matchMedia('(hover: hover) and (pointer: fine)');
@@ -22,6 +23,8 @@ if (raiz.classList.contains('movido')) iniciar();
 
 function iniciar() {
   introYPortada();
+  emerger();
+  contadores();
   revelados();
   palabras();
   if (suave) return;
@@ -48,6 +51,8 @@ function introYPortada() {
   const arrancar = () => {
     portada?.classList.add('visto');
     seccion?.classList.add('visto');
+    // la barra llega cuando la portada ya se abrió
+    setTimeout(() => raiz.classList.add('abierta'), 900);
   };
 
   if (raiz.classList.contains('con-intro') && intro) {
@@ -113,6 +118,50 @@ function revelados() {
     },
     { passive: true },
   );
+}
+
+/* ---------- subtítulos: cada palabra sale del agua ---------- */
+function emerger() {
+  const seguro = (t: string) => t.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  document.querySelectorAll<HTMLElement>('[data-emerge]').forEach((el) => {
+    const texto = (el.textContent ?? '').trim();
+    el.innerHTML =
+      `<span class="visually-hidden">${seguro(texto)}</span>` +
+      texto
+        .split(/\s+/)
+        .map((p, i) => `<span class="em" aria-hidden="true"><span class="em__in" style="--i:${i}">${seguro(p)}</span></span>`)
+        .join(' ');
+  });
+}
+
+/* ---------- precios que cuentan hasta su valor ---------- */
+function contadores() {
+  if (suave) return;
+  const io = new IntersectionObserver(
+    (es) => {
+      for (const e of es) {
+        if (!e.isIntersecting) continue;
+        io.unobserve(e.target);
+        const visible = e.target.querySelector<HTMLElement>('[data-cuenta-vis]')!;
+        const final = Number((e.target as HTMLElement).dataset.contar);
+        const t0 = performance.now();
+        const paso = (t: number) => {
+          const p = Math.min(1, (t - t0) / 1500);
+          const k = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+          visible.textContent = pesos(Math.round((final * k) / 1000) * 1000);
+          if (p < 1) requestAnimationFrame(paso);
+        };
+        requestAnimationFrame(paso);
+      }
+    },
+    { threshold: 0.6 },
+  );
+  document.querySelectorAll<HTMLElement>('[data-contar]').forEach((el) => {
+    const final = el.textContent?.trim() ?? '';
+    // el valor real queda para lectores de pantalla; el número que cuenta es solo visual
+    el.innerHTML = `<span class="visually-hidden">${final}</span><span aria-hidden="true" data-cuenta-vis>${pesos(0)}</span>`;
+    io.observe(el);
+  });
 }
 
 /* ---------- palabras que se enfocan una a una (reseñas) ---------- */

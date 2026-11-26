@@ -18,11 +18,11 @@ const base = precios.planes[0];
         <dl class="flyer__precios">
           <div>
             <dt>Lunes a jueves</dt>
-            <dd>{pesos(base.semana as number)}</dd>
+            <dd data-contar={base.semana}>{pesos(base.semana as number)}</dd>
           </div>
           <div>
             <dt>Viernes a domingo</dt>
-            <dd>{pesos(base.finde as number)}</dd>
+            <dd data-contar={base.finde}>{pesos(base.finde as number)}</dd>
           </div>
         </dl>
         <p class="flyer__nota">Por pareja, por noche. Check-in a las 3:00 p. m. y check-out a las 12:00 m.</p>
@@ -52,7 +52,7 @@ const base = precios.planes[0];
 
   <div class="marco seccion__cuerpo casa">
     <div class="casa__texto" data-revelar="grupo">
-      <p class="sub">Dos niveles sobre el agua, solo para ustedes dos.</p>
+      <p class="sub" data-emerge>Dos niveles sobre el agua, solo para ustedes dos.</p>
       <p class="texto">
         Ventanales de piso a techo, un jacuzzi privado en la cubierta y una terraza arriba con vista abierta al embalse
         y a la Piedra del Peñol. Adentro, cama queen y una cocina dotada.

@@ -56,8 +56,8 @@ const ocasiones = ['aniversario', 'cumpleaños', 'pedida', 'solo porque sí'];
                   </td>
                 ) : (
                   <>
-                    <td class="plan__precio" data-label="Semana">{pesos(p.semana)}</td>
-                    <td class="plan__precio" data-label="Fin de semana">{pesos(p.finde as number)}</td>
+                    <td class="plan__precio" data-label="Semana" data-contar={p.semana}>{pesos(p.semana)}</td>
+                    <td class="plan__precio" data-label="Fin de semana" data-contar={p.finde}>{pesos(p.finde as number)}</td>
                   </>
                 )}
               </tr>

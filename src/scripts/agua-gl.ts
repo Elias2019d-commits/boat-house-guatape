@@ -11,7 +11,8 @@
  * Si algo falla, la foto normal queda en su lugar.
  */
 
-const MAX_GOTAS = 10;
+// gotas simultáneas: 28 donde el dispositivo lo permite, 10 en equipos muy viejos
+let MAX_GOTAS = 10;
 
 const VERT = `
 attribute vec2 a;
@@ -21,7 +22,7 @@ void main() {
   gl_Position = vec4(a, 0.0, 1.0);
 }`;
 
-const FRAG = `
+const frag = () => `
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -88,6 +89,7 @@ export function iniciarAguaGL(escena: HTMLElement) {
   canvas.setAttribute('aria-hidden', 'true');
   const gl = canvas.getContext('webgl', { alpha: false, antialias: false, premultipliedAlpha: false });
   if (!gl) return;
+  MAX_GOTAS = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) >= 64 ? 28 : 10;
 
   const shader = (tipo: number, src: string) => {
     const s = gl.createShader(tipo)!;
@@ -96,7 +98,7 @@ export function iniciarAguaGL(escena: HTMLElement) {
     return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null;
   };
   const vs = shader(gl.VERTEX_SHADER, VERT);
-  const fs = shader(gl.FRAGMENT_SHADER, FRAG);
+  const fs = shader(gl.FRAGMENT_SHADER, frag());
   if (!vs || !fs) return;
   const prog = gl.createProgram()!;
   gl.attachShader(prog, vs);
@@ -239,6 +241,10 @@ export function iniciarAguaGL(escena: HTMLElement) {
     gota(0.5, yAgua(0.42), 1.4, 0.35);
     gota(0.3, yAgua(0.62), 0.9, 1.0);
     gota(0.72, yAgua(0.3), 0.7, 1.6);
+    // la lancha cruza: una fila de gotas que avanza de lado a lado deja la estela
+    if (MAX_GOTAS >= 20) {
+      for (let k = 0; k < 20; k++) gota(-0.06 + k * 0.06, yAgua(0.58), 0.5, 2.4 + k * 0.12);
+    }
     const calmar = () => {
       const t = ahora() - inicio;
       // empieza agitada y se asienta en 3,5 s

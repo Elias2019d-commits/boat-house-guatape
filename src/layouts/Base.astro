@@ -105,6 +105,8 @@ const fuentes = `
         // la intro se ve en cada visita; con "reducir movimiento" se ve en versión de fundidos
         d.classList.add('js', 'movido', 'con-intro');
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('suave');
+        // red de seguridad: la barra aparece aunque falle el script de movimiento
+        setTimeout(function () { d.classList.add('abierta'); }, 4000);
       })();
     </script>
   </head>
